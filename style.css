@@ -1,0 +1,36 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #111;
+    color: #fff;
+}
+
+header {
+    background: #000;
+    padding: 20px;
+    text-align: center;
+}
+
+.products {
+    padding: 20px;
+}
+
+.product {
+    background: #1c1c1c;
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 300px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background: #ffcc00;
+    cursor: pointer;
+    border-radius: 5px;
+}
