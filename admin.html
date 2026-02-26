@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Vinyl Shop Admin</title>
+</head>
+<body>
+  <h1>Добавить товар</h1>
+
+  <input id="title" placeholder="Название"><br><br>
+  <input id="price" placeholder="Цена"><br><br>
+  <input id="category" placeholder="Категория"><br><br>
+
+  <button onclick="addProduct()">Добавить</button>
+
+  <h2>Список товаров</h2>
+  <ul id="products"></ul>
+
+<script>
+async function loadProducts() {
+  const res = await fetch('/api/products');
+  const products = await res.json();
+
+  const list = document.getElementById('products');
+  list.innerHTML = "";
+
+  products.forEach(p => {
+    const li = document.createElement('li');
+    li.innerText = p.title + " — " + p.price;
+    list.appendChild(li);
+  });
+}
+
+async function addProduct() {
+  const title = document.getElementById('title').value;
+  const price = document.getElementById('price').value;
+  const category = document.getElementById('category').value;
+
+  await fetch('/api/add-product', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, price, category })
+  });
+
+  loadProducts();
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>
