@@ -7,6 +7,11 @@ export default async function handler(req, res) {
   }
 
   try {
+
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return res.status(500).json({ error: "Missing Supabase environment variables" })
+    }
+
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -18,14 +23,14 @@ export default async function handler(req, res) {
       .order('id', { ascending: false })
 
     if (error) {
-      console.error(error)
+      console.error("Supabase error:", error)
       return res.status(500).json({ error })
     }
 
     return res.status(200).json(data)
 
   } catch (err) {
-    console.error(err)
+    console.error("Server error:", err)
     return res.status(500).json({ error: err.message })
   }
 }
