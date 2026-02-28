@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
-      return res.status(200).json({ message: "API working" });
+      return res.status(405).json({ message: "Only POST allowed" });
     }
 
     const { name, phone, product, price } = req.body;
@@ -24,6 +24,11 @@ export default async function handler(req, res) {
         }),
       }
     );
+
+    if (!telegramResponse.ok) {
+      const details = await telegramResponse.text();
+      return res.status(502).json({ success: false, error: details });
+    }
 
     return res.status(200).json({ success: true });
   } catch (error) {
