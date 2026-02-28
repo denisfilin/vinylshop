@@ -22,6 +22,9 @@ export default async function handler(req, res) {
       console.error(error)
       return res.status(500).json({ success: false, error })
     }
+    if (!title || !price) {
+  return res.status(400).json({ error: "Title and price are required" })
+}
 
     return res.status(200).json({ success: true, data })
 
