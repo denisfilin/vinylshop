@@ -1,14 +1,33 @@
+import { createClient } from '@supabase/supabase-js'
+
 export default async function handler(req, res) {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-  const response = await fetch(`${supabaseUrl}/rest/v1/products?select=*`, {
-    headers: {
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-    },
-  });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Only POST allowed' })
+  }
 
-  const data = await response.json();
-  res.status(200).json(data);
+  try {
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+
+    const { title, price, category, description, image } = req.body
+
+    const { data, error } = await supabase
+      .from('products')
+      .insert([{ title, price, category, description, image }])
+      .select()
+
+    if (error) {
+      console.error(error)
+      return res.status(500).json({ success: false, error })
+    }
+
+    return res.status(200).json({ success: true, data })
+
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ success: false, error: err.message })
+  }
 }
