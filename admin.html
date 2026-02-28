@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<h1>Vinyl Shop — Админка</h1>
+<h1>Vinyl Shop — Админ-панель</h1>
 
 <h2>Добавить товар</h2>
 
@@ -31,11 +31,9 @@
 
 <script>
 
-const API_BASE = "https://vinylshop.tech";
-
 async function loadProducts() {
   try {
-    const res = await fetch(`${API_BASE}/api/products`);
+    const res = await fetch('/api/products');
     const products = await res.json();
 
     const container = document.getElementById('products');
@@ -61,8 +59,8 @@ async function loadProducts() {
     });
 
   } catch (error) {
-    alert("Ошибка загрузки товаров");
     console.error(error);
+    alert("Ошибка загрузки товаров");
   }
 }
 
@@ -74,7 +72,7 @@ async function addProduct() {
     const description = document.getElementById('description').value;
     const image = document.getElementById('image').value;
 
-    const res = await fetch(`${API_BASE}/api/add-product`, {
+    const res = await fetch('/api/add-product', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, price, category, description, image })
@@ -83,8 +81,8 @@ async function addProduct() {
     const result = await res.json();
 
     if (!result.success) {
-      alert("Ошибка добавления");
       console.error(result);
+      alert("Ошибка добавления товара");
       return;
     }
 
@@ -97,18 +95,18 @@ async function addProduct() {
     loadProducts();
 
   } catch (error) {
-    alert("Ошибка добавления товара");
     console.error(error);
+    alert("Ошибка добавления товара");
   }
 }
 
 async function deleteProduct(id) {
   try {
-    await fetch(`${API_BASE}/api/delete-product?id=${id}`);
+    await fetch(`/api/delete-product?id=${id}`);
     loadProducts();
   } catch (error) {
-    alert("Ошибка удаления");
     console.error(error);
+    alert("Ошибка удаления");
   }
 }
 
@@ -118,4 +116,3 @@ loadProducts();
 
 </body>
 </html>
-
