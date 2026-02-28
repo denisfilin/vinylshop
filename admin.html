@@ -5,16 +5,23 @@
   <title>Vinyl Shop Admin</title>
 </head>
 <body>
-  <h1>Добавить товар</h1>
 
-  <input id="title" placeholder="Название"><br><br>
-  <input id="price" placeholder="Цена"><br><br>
-  <input id="category" placeholder="Категория"><br><br>
+<h1>Vinyl Shop — Админ-панель</h1>
 
-  <button onclick="addProduct()">Добавить</button>
+<h2>Добавить товар</h2>
 
-  <h2>Список товаров</h2>
-  <ul id="products"></ul>
+<input id="title" placeholder="Название"><br><br>
+<input id="price" placeholder="Цена"><br><br>
+<input id="category" placeholder="Категория"><br><br>
+<textarea id="description" placeholder="Описание"></textarea><br><br>
+<input id="image" placeholder="URL изображения"><br><br>
+
+<button onclick="addProduct()">Добавить товар</button>
+
+<hr>
+
+<h2>Список товаров</h2>
+<ul id="products"></ul>
 
 <script>
 async function loadProducts() {
@@ -26,7 +33,12 @@ async function loadProducts() {
 
   products.forEach(p => {
     const li = document.createElement('li');
-    li.innerText = p.title + " — " + p.price;
+    li.innerHTML = `
+      <b>${p.title}</b> — ${p.price} (${p.category})
+      <br>
+      <button onclick="deleteProduct(${p.id})">Удалить</button>
+      <hr>
+    `;
     list.appendChild(li);
   });
 }
@@ -35,13 +47,20 @@ async function addProduct() {
   const title = document.getElementById('title').value;
   const price = document.getElementById('price').value;
   const category = document.getElementById('category').value;
+  const description = document.getElementById('description').value;
+  const image = document.getElementById('image').value;
 
   await fetch('/api/add-product', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, price, category })
+    body: JSON.stringify({ title, price, category, description, image })
   });
 
+  loadProducts();
+}
+
+async function deleteProduct(id) {
+  await fetch('/api/delete-product?id=' + id);
   loadProducts();
 }
 
