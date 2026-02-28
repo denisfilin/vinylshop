@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Vinyl Shop Admin</title>
+  <style>
+    body { font-family: Arial; max-width: 800px; margin: 40px auto; }
+    input, textarea { width: 100%; padding: 8px; margin-bottom: 10px; }
+    button { padding: 8px 12px; cursor: pointer; }
+    .product { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+  </style>
 </head>
 <body>
 
@@ -10,61 +16,104 @@
 
 <h2>Добавить товар</h2>
 
-<input id="title" placeholder="Название"><br><br>
-<input id="price" placeholder="Цена"><br><br>
-<input id="category" placeholder="Категория"><br><br>
-<textarea id="description" placeholder="Описание"></textarea><br><br>
-<input id="image" placeholder="URL изображения"><br><br>
+<input id="title" placeholder="Название">
+<input id="price" placeholder="Цена">
+<input id="category" placeholder="Категория">
+<textarea id="description" placeholder="Описание"></textarea>
+<input id="image" placeholder="URL изображения">
 
 <button onclick="addProduct()">Добавить товар</button>
 
 <hr>
 
 <h2>Список товаров</h2>
-<ul id="products"></ul>
+<div id="products"></div>
 
 <script>
+
+const API_BASE = "https://vinylshop.tech";
+
 async function loadProducts() {
-  const res = await fetch('/api/products');
-  const products = await res.json();
+  try {
+    const res = await fetch(`${API_BASE}/api/products`);
+    const products = await res.json();
 
-  const list = document.getElementById('products');
-  list.innerHTML = "";
+    const container = document.getElementById('products');
+    container.innerHTML = "";
 
-  products.forEach(p => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <b>${p.title}</b> — ${p.price} (${p.category})
-      <br>
-      <button onclick="deleteProduct(${p.id})">Удалить</button>
-      <hr>
-    `;
-    list.appendChild(li);
-  });
+    if (!products.length) {
+      container.innerHTML = "<p>Товаров пока нет</p>";
+      return;
+    }
+
+    products.forEach(p => {
+      const div = document.createElement('div');
+      div.className = "product";
+      div.innerHTML = `
+        <b>${p.title}</b><br>
+        Цена: ${p.price}<br>
+        Категория: ${p.category}<br>
+        ${p.description ? "Описание: " + p.description + "<br>" : ""}
+        ${p.image ? `<img src="${p.image}" width="100"><br>` : ""}
+        <button onclick="deleteProduct(${p.id})">Удалить</button>
+      `;
+      container.appendChild(div);
+    });
+
+  } catch (error) {
+    alert("Ошибка загрузки товаров");
+    console.error(error);
+  }
 }
 
 async function addProduct() {
-  const title = document.getElementById('title').value;
-  const price = document.getElementById('price').value;
-  const category = document.getElementById('category').value;
-  const description = document.getElementById('description').value;
-  const image = document.getElementById('image').value;
+  try {
+    const title = document.getElementById('title').value;
+    const price = document.getElementById('price').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value;
+    const image = document.getElementById('image').value;
 
-  await fetch('/api/add-product', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, price, category, description, image })
-  });
+    const res = await fetch(`${API_BASE}/api/add-product`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, price, category, description, image })
+    });
 
-  loadProducts();
+    const result = await res.json();
+
+    if (!result.success) {
+      alert("Ошибка добавления");
+      console.error(result);
+      return;
+    }
+
+    document.getElementById('title').value = "";
+    document.getElementById('price').value = "";
+    document.getElementById('category').value = "";
+    document.getElementById('description').value = "";
+    document.getElementById('image').value = "";
+
+    loadProducts();
+
+  } catch (error) {
+    alert("Ошибка добавления товара");
+    console.error(error);
+  }
 }
 
 async function deleteProduct(id) {
-  await fetch('/api/delete-product?id=' + id);
-  loadProducts();
+  try {
+    await fetch(`${API_BASE}/api/delete-product?id=${id}`);
+    loadProducts();
+  } catch (error) {
+    alert("Ошибка удаления");
+    console.error(error);
+  }
 }
 
 loadProducts();
+
 </script>
 
 </body>
