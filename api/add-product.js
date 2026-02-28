@@ -1,28 +1,26 @@
-import fs from "fs";
-import path from "path";
-
-const filePath = path.join(process.cwd(), "data", "products.json");
-
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Only POST allowed" });
   }
 
-  try {
-    const newProduct = req.body;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-    const fileData = fs.readFileSync(filePath);
-    const products = JSON.parse(fileData);
+  const response = await fetch(`${supabaseUrl}/rest/v1/products`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(req.body),
+  });
 
-    products.push({
-      id: Date.now(),
-      ...newProduct
-    });
-
-    fs.writeFileSync(filePath, JSON.stringify(products, null, 2));
-
-    res.status(200).json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: "Cannot save product" });
+  if (!response.ok) {
+    const error = await response.text();
+    return res.status(500).json({ error });
   }
+
+  res.status(200).json({ success: true });
 }
