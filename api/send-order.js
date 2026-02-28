@@ -9,6 +9,10 @@ export default async function handler(req, res) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
+    if (!token || !chatId) {
+      return res.status(500).json({ error: "Telegram environment variables missing" });
+    }
+
     const telegramResponse = await fetch(
       `https://api.telegram.org/bot${token}/sendMessage`,
       {
@@ -20,7 +24,7 @@ export default async function handler(req, res) {
 Имя: ${name}
 Телефон: ${phone}
 Товар: ${product}
-Цена: ${price}`,
+Цена: ${price}`
         }),
       }
     );
@@ -31,12 +35,8 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({ success: true });
+
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-  if (!token || !chatId) {
-  return res.status(500).json({ error: "Telegram environment variables missing" });
 }
-}
-
-
