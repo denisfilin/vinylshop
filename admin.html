@@ -102,7 +102,7 @@ async function addProduct() {
 
 async function deleteProduct(id) {
   try {
-    await fetch(`/api/delete-product?id=${id}`);
+    await fetch(`/api/delete-product?id=${id}`, { method: "DELETE" });
     loadProducts();
   } catch (error) {
     console.error(error);
