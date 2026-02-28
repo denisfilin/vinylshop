@@ -1,14 +1,14 @@
-import fs from "fs";
-import path from "path";
+export default async function handler(req, res) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-const filePath = path.join(process.cwd(), "data", "products.json");
+  const response = await fetch(`${supabaseUrl}/rest/v1/products?select=*`, {
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+    },
+  });
 
-export default function handler(req, res) {
-  try {
-    const fileData = fs.readFileSync(filePath);
-    const products = JSON.parse(fileData);
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({ error: "Cannot read products" });
-  }
+  const data = await response.json();
+  res.status(200).json(data);
 }
