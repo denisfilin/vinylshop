@@ -148,21 +148,24 @@ function toggleTheme(){
 }
 
 /* =========================
-   УМНАЯ ЗАГРУЗКА БАЗЫ
+   ЗАГРУЗКА
 ========================= */
 async function loadProducts(){
   try {
     const res = await fetch('/api/products');
-    if(!res.ok) throw new Error("API not found");
+    if(!res.ok) throw new Error("API not working");
     allProducts = await res.json();
   } catch(e) {
-    console.warn("API не найдено — используем localStorage");
+    console.warn("Работаем через localStorage");
     allProducts = JSON.parse(localStorage.getItem("vinylProducts")) || [];
   }
 
   renderProducts();
 }
 
+/* =========================
+   РЕНДЕР
+========================= */
 function renderProducts(){
   const search = document.getElementById('search').value.toLowerCase();
   const filterCategory = document.getElementById('filterCategory').value.toLowerCase();
@@ -178,14 +181,15 @@ function renderProducts(){
   container.innerHTML='';
 
   filtered.forEach(p=>{
-    container.innerHTML+=`
-      <div class="glass product">
+    const div = document.createElement('div');
+    div.className = "glass product";
+    div.innerHTML = `
         <img src="${p.image || ''}" />
         <div class="product-title">${p.title}</div>
         <div class="product-price">${p.price} ₽</div>
         <button onclick="deleteProduct(${p.id})">Удалить</button>
-      </div>
     `;
+    container.appendChild(div);
   });
 }
 
@@ -196,7 +200,7 @@ function updateStats(products){
 }
 
 /* =========================
-   ДОБАВЛЕНИЕ ТОВАРА
+   ДОБАВЛЕНИЕ (МГНОВЕННО)
 ========================= */
 async function addProduct(){
   const title = titleInput.value.trim();
@@ -212,33 +216,72 @@ async function addProduct(){
     title, price, category, description, image
   };
 
+  let saved = false;
+
   try {
-    await fetch('/api/add-product',{
+    const res = await fetch('/api/add-product',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(newProduct)
     });
+
+    if(res.ok){
+      saved = true;
+    } else {
+      throw new Error("API failed");
+    }
+
   } catch(e) {
     let local = JSON.parse(localStorage.getItem("vinylProducts")) || [];
     local.push(newProduct);
     localStorage.setItem("vinylProducts", JSON.stringify(local));
+    saved = true;
   }
 
-  loadProducts();
+  if(saved){
+    // 🔥 ДОБАВЛЯЕМ В МАССИВ БЕЗ ПЕРЕЗАГРУЗКИ
+    allProducts.push(newProduct);
+    renderProducts();
+
+    // очищаем поля
+    titleInput.value="";
+    priceInput.value="";
+    categoryInput.value="";
+    descriptionInput.value="";
+    imageInput.value="";
+  }
 }
 
 /* =========================
-   УДАЛЕНИЕ
+   УДАЛЕНИЕ (МГНОВЕННО)
 ========================= */
 async function deleteProduct(id){
+
+  let deleted = false;
+
   try {
-    await fetch(`/api/delete-product?id=${id}`,{method:'DELETE'});
+    const res = await fetch(`/api/delete-product?id=${id}`,{
+      method:'DELETE'
+    });
+
+    if(res.ok){
+      deleted = true;
+    } else {
+      throw new Error("API failed");
+    }
+
   } catch(e) {
     let local = JSON.parse(localStorage.getItem("vinylProducts")) || [];
     local = local.filter(p=>p.id!==id);
     localStorage.setItem("vinylProducts", JSON.stringify(local));
+    deleted = true;
   }
-  loadProducts();
+
+  if(deleted){
+    // 🔥 УДАЛЯЕМ ИЗ МАССИВА БЕЗ ПЕРЕЗАГРУЗКИ
+    allProducts = allProducts.filter(p=>p.id!==id);
+    renderProducts();
+  }
 }
 
 /* Drag & Drop */
