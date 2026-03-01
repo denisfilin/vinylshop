@@ -32,9 +32,26 @@
       display: block;
       margin-bottom: 10px;
     }
+
+    #adminPanel {
+      display: none;
+    }
+
+    #loginBox {
+      text-align: center;
+      margin-top: 100px;
+    }
   </style>
 </head>
 <body>
+
+<div id="loginBox">
+  <h2>Введите пароль</h2>
+  <input type="password" id="password" placeholder="Пароль" />
+  <button onclick="checkPassword()">Войти</button>
+</div>
+
+<div id="adminPanel">
 
 <h1>Админ-панель</h1>
 
@@ -53,7 +70,23 @@
 <h2>Список товаров</h2>
 <div id="products"></div>
 
+</div>
+
 <script>
+const ADMIN_PASSWORD = "vinyl2026"; // ← поменяй пароль здесь
+
+function checkPassword() {
+  const input = document.getElementById('password').value;
+
+  if (input === ADMIN_PASSWORD) {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadProducts();
+  } else {
+    alert("Неверный пароль");
+  }
+}
+
 async function loadProducts() {
   const res = await fetch('/api/products');
   const data = await res.json();
@@ -90,16 +123,8 @@ async function addProduct() {
 
   const res = await fetch('/api/add-product', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      title,
-      price,
-      category,
-      description,
-      image
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, price, category, description, image })
   });
 
   const result = await res.json();
@@ -128,8 +153,6 @@ async function deleteProduct(id) {
     alert("Ошибка удаления");
   }
 }
-
-loadProducts();
 </script>
 
 </body>
