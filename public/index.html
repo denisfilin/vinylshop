@@ -12,6 +12,14 @@
   --bg:#000;
   --text:#fff;
   --card:rgba(255,255,255,0.06);
+  --glass:rgba(255,255,255,0.08);
+}
+
+body.light{
+  --bg:#f5f5f7;
+  --text:#111;
+  --card:rgba(0,0,0,0.05);
+  --glass:rgba(255,255,255,0.7);
 }
 
 body{
@@ -19,7 +27,57 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:'Inter',sans-serif;
+  transition:0.4s;
   overflow-x:hidden;
+}
+
+/* TOP BACKGROUND BLOCK */
+.top-bg{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:400px;
+  background:url('/brick-wall-background.avif') center/cover no-repeat;
+  z-index:-1;
+  filter:brightness(0.6);
+}
+
+/* HEADER */
+header{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 40px;
+  backdrop-filter:blur(20px);
+  background:var(--glass);
+  z-index:100;
+}
+
+.logo{
+  height:40px;
+}
+
+.controls{
+  display:flex;
+  gap:15px;
+}
+
+button{
+  padding:8px 14px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
 }
 
 /* HERO */
@@ -29,96 +87,60 @@ body{
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  position:relative;
+  text-align:center;
 }
 
-/* 3D SCENE */
-.scene{
-  width:300px;
-  height:300px;
-  perspective:1000px;
-  position:relative;
-}
-
-.vinyl{
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at center,#c00 8%,#111 9%,#000 70%);
-  position:absolute;
-  top:20px;
-  left:20px;
-  animation:spin 8s linear infinite;
-  box-shadow:
-    inset 0 0 30px rgba(255,255,255,0.2),
-    0 20px 40px rgba(0,0,0,0.6);
-}
-
-.tonearm{
-  width:200px;
-  height:6px;
-  background:#ccc;
-  position:absolute;
-  top:40px;
-  left:120px;
-  transform-origin:left center;
-  transform:rotate(25deg);
-  border-radius:4px;
-}
-
-.tonearm::after{
-  content:'';
-  width:20px;
-  height:20px;
-  background:#888;
-  position:absolute;
-  right:-10px;
-  top:-7px;
-  border-radius:50%;
-}
-
-@keyframes spin{
-  to{transform:rotate(360deg);}
+.hero h1{
+  font-size:48px;
+  margin-bottom:30px;
 }
 
 /* CATALOG */
 .section{
-  padding:80px 5%;
+  padding:100px 5%;
 }
 
 .products{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:40px;
   justify-items:center;
 }
 
-/* уменьшили в 4 раза */
+/* Увеличены в 2 раза */
 .card{
-  width:100px;
+  width:200px;
   background:var(--card);
-  padding:8px;
-  border-radius:12px;
+  padding:20px;
+  border-radius:20px;
   text-align:center;
+  backdrop-filter:blur(20px);
   transition:0.4s;
+  opacity:0;
+  transform:translateY(40px);
+}
+
+.card.show{
+  opacity:1;
+  transform:translateY(0);
 }
 
 .card:hover{
-  transform:translateY(-5px);
+  transform:translateY(-8px);
 }
 
 .card img{
   width:100%;
-  border-radius:8px;
+  border-radius:12px;
 }
 
 .card h3{
-  font-size:10px;
+  margin:10px 0 5px;
+  font-size:18px;
 }
 
 .card p{
-  font-size:9px;
+  font-size:16px;
   opacity:0.7;
 }
 
@@ -127,8 +149,8 @@ body{
   position:fixed;
   right:30px;
   bottom:30px;
-  width:60px;
-  height:60px;
+  width:70px;
+  height:70px;
   border-radius:50%;
   background:#fff;
   color:#000;
@@ -149,17 +171,23 @@ body{
 
 <body>
 
-<section class="hero">
-  <h1>Vinyl Shop</h1>
+<div class="top-bg"></div>
 
-  <div class="scene">
-    <div class="vinyl"></div>
-    <div class="tonearm"></div>
+<header>
+  <img src="/logo.png" class="logo">
+
+  <div class="controls">
+    <button onclick="toggleLang()">RU / EN</button>
+    <button onclick="toggleTheme()">🌗</button>
   </div>
+</header>
+
+<section class="hero">
+  <h1 id="heroTitle">Виниловая эстетика</h1>
 </section>
 
 <section class="section">
-  <h2>Каталог</h2>
+  <h2 id="catalogTitle">Каталог</h2>
   <div class="products" id="products"></div>
 </section>
 
@@ -169,21 +197,46 @@ body{
 
 <script>
 let cart=[];
+let currentLang='ru';
+
+const translations={
+  ru:{
+    hero:"Виниловая эстетика",
+    catalog:"Каталог"
+  },
+  en:{
+    hero:"Vinyl Aesthetic",
+    catalog:"Catalog"
+  }
+};
+
+function toggleLang(){
+  currentLang=currentLang==='ru'?'en':'ru';
+  document.getElementById('heroTitle').innerText=translations[currentLang].hero;
+  document.getElementById('catalogTitle').innerText=translations[currentLang].catalog;
+}
+
+function toggleTheme(){
+  document.body.classList.toggle('light');
+}
 
 async function loadProducts(){
   const res=await fetch('/api/products');
   const data=await res.json();
   const container=document.getElementById('products');
 
-  data.forEach(product=>{
-    container.innerHTML+=`
-      <div class="card">
-        <img src="${product.image}">
-        <h3>${product.name}</h3>
-        <p>${product.price} ₽</p>
-        <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
-      </div>
+  data.forEach((product,i)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <img src="${product.image}">
+      <h3>${product.name}</h3>
+      <p>${product.price} ₽</p>
+      <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
     `;
+    container.appendChild(card);
+
+    setTimeout(()=>card.classList.add('show'),i*100);
   });
 }
 
@@ -193,7 +246,7 @@ function addToCart(product){
 }
 
 function openCart(){
-  alert("В корзине товаров: "+cart.length);
+  alert("Товаров в корзине: "+cart.length);
 }
 
 loadProducts();
