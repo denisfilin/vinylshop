@@ -8,54 +8,49 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
-* {
+html {
+  scroll-behavior: smooth;
+}
+
+*{
   margin:0;
   padding:0;
   box-sizing:border-box;
   font-family:'Inter',sans-serif;
 }
 
-body {
+body{
   background:#000;
   color:#fff;
   overflow-x:hidden;
 }
 
 /* NAV */
-nav {
+nav{
   position:fixed;
   top:0;
   width:100%;
-  backdrop-filter: blur(20px);
-  background: rgba(0,0,0,0.5);
+  backdrop-filter:blur(20px);
+  background:rgba(0,0,0,0.5);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:15px 50px;
+  padding:12px 40px;
   z-index:1000;
 }
 
-nav img {
-  height:40px;
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-nav button {
-  background:transparent;
-  border:1px solid rgba(255,255,255,0.3);
-  color:#fff;
-  padding:6px 12px;
-  border-radius:20px;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-nav button:hover {
-  background:#fff;
-  color:#000;
+.logo img{
+  height:30px;
 }
 
 /* HERO */
-.hero {
+.hero{
   position:relative;
   height:100vh;
   display:flex;
@@ -65,7 +60,7 @@ nav button:hover {
   overflow:hidden;
 }
 
-.hero video {
+.hero video{
   position:absolute;
   width:100%;
   height:100%;
@@ -73,86 +68,99 @@ nav button:hover {
   z-index:-2;
 }
 
-.hero::after {
+.hero::after{
   content:'';
   position:absolute;
   width:100%;
   height:100%;
-  background:linear-gradient(to bottom,rgba(0,0,0,0.2),#000);
+  background:linear-gradient(to bottom,rgba(0,0,0,0.3),#000);
   z-index:-1;
 }
 
-.hero-content {
-  transform:translateY(0);
-  transition:transform 0.2s ease-out;
+.hero-content{
+  z-index:2;
 }
 
-.hero h1 {
-  font-size:64px;
+.hero h1{
+  font-size:56px;
   font-weight:800;
 }
 
-.hero p {
-  font-size:20px;
+.hero p{
   margin-top:20px;
   opacity:0.8;
 }
 
-/* PRODUCTS */
-.section {
-  padding:120px 10%;
+/* ВРАЩАЮЩАЯСЯ ПЛАСТИНКА */
+.vinyl{
+  margin-top:40px;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
+  box-shadow:0 0 40px rgba(255,255,255,0.2);
+  animation:spin 8s linear infinite;
 }
 
-.section h2 {
-  font-size:42px;
-  margin-bottom:60px;
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+/* PRODUCTS */
+.section{
+  padding:100px 5%;
+}
+
+.section h2{
+  font-size:32px;
+  text-align:center;
+  margin-bottom:40px;
+}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:20px;
+  justify-items:center;
+}
+
+.card{
+  width:120px;              /* уменьшено */
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(15px);
+  border-radius:12px;
+  padding:10px;
+  transition:0.3s;
   text-align:center;
 }
 
-.products {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:40px;
-}
-
-.card {
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(20px);
-  border-radius:20px;
-  padding:30px;
-  transition:0.4s;
-}
-
-.card:hover {
-  transform:translateY(-10px);
+.card:hover{
+  transform:translateY(-5px);
   background:rgba(255,255,255,0.1);
 }
 
-.card img {
+.card img{
   width:100%;
-  border-radius:15px;
+  border-radius:8px;
 }
 
-.card h3 {
-  margin-top:20px;
+.card h3{
+  font-size:12px;
+  margin-top:8px;
 }
 
-.card p {
-  opacity:0.7;
-}
-
-.card span {
-  display:block;
-  margin-top:10px;
-  font-weight:600;
+.card span{
+  font-size:11px;
+  opacity:0.8;
 }
 
 /* FOOTER */
-footer {
+footer{
   text-align:center;
-  padding:40px;
-  background:#000;
-  opacity:0.6;
+  padding:30px;
+  opacity:0.5;
 }
 </style>
 </head>
@@ -160,76 +168,58 @@ footer {
 <body>
 
 <nav>
-  <img src="Logo.png" alt="Vinyl Shop Logo">
-  <button onclick="toggleLang()">EN</button>
+  <div class="logo">
+    <!-- ВАЖНО: положи logo.png в ту же папку что и index.html -->
+    <img src="./logo.png" alt="Vinyl Shop">
+    <span>Vinyl Shop</span>
+  </div>
 </nav>
 
 <section class="hero">
   <video autoplay muted loop>
     <source src="https://cdn.coverr.co/videos/coverr-vinyl-record-spinning-1902/1080p.mp4" type="video/mp4">
   </video>
-  <div class="hero-content" id="heroContent">
-    <h1 id="heroTitle">Музыка. Стиль. Атмосфера.</h1>
-    <p id="heroText">Премиальные виниловые пластинки для настоящих ценителей.</p>
+
+  <div class="hero-content">
+    <h1>Музыка. Стиль. Атмосфера.</h1>
+    <p>Премиальные виниловые пластинки</p>
+
+    <div class="vinyl"></div>
   </div>
 </section>
 
-<section class="section">
-  <h2 id="catalogTitle">Каталог</h2>
+<section class="section" id="catalog">
+  <h2>Каталог</h2>
   <div class="products" id="products"></div>
 </section>
 
 <footer>
-  © 2026 Vinyl Shop
+© 2026 Vinyl Shop
 </footer>
 
 <script>
-// Параллакс hero
-window.addEventListener("scroll", () => {
-  const offset = window.pageYOffset;
-  document.getElementById("heroContent").style.transform =
-    "translateY(" + offset * 0.4 + "px)";
-});
-
-// Загрузка товаров
 async function loadProducts(){
-  const res = await fetch('/api/products');
-  const data = await res.json();
-  const container = document.getElementById('products');
-  container.innerHTML='';
+  try{
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    const container=document.getElementById('products');
+    container.innerHTML='';
 
-  data.forEach(product=>{
-    container.innerHTML += `
-      <div class="card">
-        <img src="${product.image}">
-        <h3>${product.name}</h3>
-        <p>${product.description || ''}</p>
-        <span>${product.price} ₽</span>
-      </div>
-    `;
-  });
+    data.forEach(product=>{
+      container.innerHTML+=`
+        <div class="card">
+          <img src="${product.image}">
+          <h3>${product.name}</h3>
+          <span>${product.price} ₽</span>
+        </div>
+      `;
+    });
+  }catch(e){
+    console.log("Ошибка загрузки товаров");
+  }
 }
 
 loadProducts();
-
-// Переключение языка
-let lang='ru';
-
-function toggleLang(){
-  if(lang==='ru'){
-    document.getElementById("heroTitle").innerText="Music. Style. Atmosphere.";
-    document.getElementById("heroText").innerText="Premium vinyl records for true collectors.";
-    document.getElementById("catalogTitle").innerText="Catalog";
-    document.querySelector("nav button").innerText="RU";
-    lang='en';
-  } else {
-    document.getElementById("heroTitle").innerText="Музыка. Стиль. Атмосфера.";
-    document.getElementById("heroText").innerText="Премиальные виниловые пластинки для настоящих ценителей.";
-    document.getElementById("catalogTitle").innerText="Каталог";
-    document.querySelector("nav button").innerText="EN";
-    lang='ru';
-  }
-}
 </script>
 
 </body>
