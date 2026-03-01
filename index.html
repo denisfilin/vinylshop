@@ -1,33 +1,197 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinyl Shop</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vinyl Shop</title>
+
+<style>
+:root {
+  --bg:#f5f5f7;
+  --text:#1d1d1f;
+  --card:rgba(255,255,255,0.7);
+  --accent:#0071e3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#0f0f12;
+    --text:#fff;
+    --card:rgba(30,30,35,0.6);
+    --accent:#4da3ff;
+  }
+}
+
+body {
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:0.3s ease;
+  overflow-x:hidden;
+}
+
+.hero {
+  height:80vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+
+.hero h1 {
+  font-size:60px;
+  margin:0;
+  opacity:0;
+  transform:translateY(40px);
+  transition:1s ease;
+}
+
+.hero p {
+  font-size:20px;
+  margin-top:20px;
+  opacity:0;
+  transform:translateY(40px);
+  transition:1.2s ease;
+}
+
+.container {
+  max-width:1200px;
+  margin:60px auto;
+  padding:20px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:30px;
+}
+
+.card {
+  background:var(--card);
+  backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  transition:0.4s ease;
+  opacity:0;
+  transform:translateY(50px);
+}
+
+.card.visible {
+  opacity:1;
+  transform:translateY(0);
+}
+
+.card:hover {
+  transform:translateY(-10px) scale(1.02);
+}
+
+.card img {
+  width:100%;
+  border-radius:15px;
+  margin-bottom:15px;
+}
+
+.title { font-weight:600; font-size:18px; }
+.price { color:var(--accent); margin:10px 0; }
+
+button {
+  padding:10px 18px;
+  border:none;
+  border-radius:20px;
+  background:var(--accent);
+  color:white;
+  cursor:pointer;
+}
+button:hover { opacity:0.9; }
+
+footer {
+  text-align:center;
+  padding:40px;
+  opacity:0.5;
+}
+</style>
 </head>
+
 <body>
-    <header>
-        <h1>Vinyl Shop</h1>
-        <p>Интернет‑магазин виниловых пластинок</p>
-    </header>
 
-    <main>
-        <section class="products">
-            <h2>Каталог</h2>
-            <div class="product">
-                <h3>Пример пластинки</h3>
-                <p>Исполнитель — Альбом</p>
-                <p class="price">2500 ₽</p>
-                <button onclick="order()">Заказать</button>
-            </div>
-        </section>
-    </main>
+<section class="hero">
+  <h1 id="heroTitle">Vinyl Shop</h1>
+  <p id="heroText">Музыка. Стиль. Атмосфера.</p>
+</section>
 
-    <footer>
-        <p>© 2026 Vinyl Shop</p>
-    </footer>
+<div class="container">
+  <div class="grid" id="products"></div>
+</div>
 
-    <script src="script.js"></script>
+<footer>
+  © 2026 Vinyl Shop
+</footer>
+
+<script>
+const heroTitle = document.getElementById('heroTitle');
+const heroText = document.getElementById('heroText');
+
+window.addEventListener('load',()=>{
+  heroTitle.style.opacity=1;
+  heroTitle.style.transform="translateY(0)";
+  heroText.style.opacity=1;
+  heroText.style.transform="translateY(0)";
+});
+
+async function loadProducts(){
+  const res = await fetch('/api/products');
+  const data = await res.json();
+  const container = document.getElementById('products');
+
+  data.forEach(p=>{
+    const card = document.createElement('div');
+    card.className="card";
+    card.innerHTML=`
+      <img src="${p.image}" />
+      <div class="title">${p.title}</div>
+      <div class="price">${p.price} ₽</div>
+      <button onclick="order('${p.title}','${p.price}')">
+        Заказать
+      </button>
+    `;
+    container.appendChild(card);
+  });
+
+  revealOnScroll();
+}
+
+function revealOnScroll(){
+  const cards = document.querySelectorAll('.card');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+      }
+    });
+  },{threshold:0.2});
+
+  cards.forEach(card=>observer.observe(card));
+}
+
+async function order(title,price){
+  const name = prompt("Ваше имя:");
+  const phone = prompt("Ваш телефон:");
+  if(!name || !phone) return;
+
+  await fetch('/api/send-order',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name,phone,product:title,price})
+  });
+
+  alert("Заказ отправлен!");
+}
+
+loadProducts();
+</script>
+
 </body>
 </html>
