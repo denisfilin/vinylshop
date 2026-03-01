@@ -8,9 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
-html {
-  scroll-behavior: smooth;
+:root{
+  --bg:#000;
+  --text:#fff;
+  --card:rgba(255,255,255,0.06);
 }
+
+body.light{
+  --bg:#f5f5f7;
+  --text:#111;
+  --card:rgba(0,0,0,0.05);
+}
+
+html{scroll-behavior:smooth;}
 
 *{
   margin:0;
@@ -20,9 +30,36 @@ html {
 }
 
 body{
-  background:#000;
-  color:#fff;
+  background:var(--bg);
+  color:var(--text);
   overflow-x:hidden;
+  transition:0.4s;
+}
+
+/* LOADER */
+#loader{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  transition:0.6s;
+}
+
+.loader-disc{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at center, #c00 8%, #111 9%, #000 60%);
+  box-shadow:0 0 40px rgba(255,255,255,0.3);
+  animation:spin 2s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
 }
 
 /* NAV */
@@ -31,28 +68,36 @@ nav{
   top:0;
   width:100%;
   backdrop-filter:blur(20px);
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,0.4);
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  padding:12px 40px;
+  padding:15px 40px;
   z-index:1000;
 }
 
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
+button{
+  background:transparent;
+  border:1px solid var(--text);
+  color:var(--text);
+  padding:8px 18px;
+  border-radius:30px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:0.3s;
 }
 
-.logo img{
-  height:30px;
+/* MAGNETIC BUTTON */
+button:hover{
+  transform:scale(1.1);
+  background:var(--text);
+  color:var(--bg);
 }
 
 /* HERO */
 .hero{
-  position:relative;
   height:100vh;
+  position:relative;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -60,166 +105,183 @@ nav{
   overflow:hidden;
 }
 
-.hero video{
+.layer{
   position:absolute;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  z-index:-2;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  will-change:transform;
 }
 
-.hero::after{
-  content:'';
-  position:absolute;
-  width:100%;
-  height:100%;
-  background:linear-gradient(to bottom,rgba(0,0,0,0.3),#000);
-  z-index:-1;
+.bg1{
+  background:url('https://images.unsplash.com/photo-1511379938547-c1f69419868d');
+  opacity:0.3;
+}
+
+.bg2{
+  background:url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4');
+  opacity:0.15;
 }
 
 .hero-content{
-  z-index:2;
+  position:relative;
+  z-index:10;
 }
 
-.hero h1{
-  font-size:56px;
-  font-weight:800;
-}
-
-.hero p{
-  margin-top:20px;
-  opacity:0.8;
-}
-
-/* ВРАЩАЮЩАЯСЯ ПЛАСТИНКА */
+/* 3D VINYL */
 .vinyl{
-  margin-top:40px;
-  width:180px;
-  height:180px;
+  margin:40px auto;
+  width:220px;
+  height:220px;
   border-radius:50%;
   background:
-    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
-  box-shadow:0 0 40px rgba(255,255,255,0.2);
-  animation:spin 8s linear infinite;
+    radial-gradient(circle at 50% 50%, #d00 0 8%, #111 9%, #000 70%);
+  box-shadow:
+    inset 0 0 30px rgba(255,255,255,0.2),
+    0 20px 40px rgba(0,0,0,0.6);
+  animation:spin 10s linear infinite;
+  position:relative;
+  transform-style:preserve-3d;
 }
 
-@keyframes spin{
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
+.vinyl::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:linear-gradient(120deg,rgba(255,255,255,0.4),transparent);
+  mix-blend-mode:overlay;
 }
 
-/* PRODUCTS */
+/* SECTION */
 .section{
-  padding:100px 5%;
-}
-
-.section h2{
-  font-size:32px;
-  text-align:center;
-  margin-bottom:40px;
+  padding:120px 8%;
 }
 
 .products{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:20px;
-  justify-items:center;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:30px;
 }
 
 .card{
-  width:120px;              /* уменьшено */
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(15px);
-  border-radius:12px;
-  padding:10px;
-  transition:0.3s;
-  text-align:center;
+  background:var(--card);
+  backdrop-filter:blur(20px);
+  padding:15px;
+  border-radius:16px;
+  opacity:0;
+  transform:translateY(40px);
+  transition:0.8s;
 }
 
-.card:hover{
-  transform:translateY(-5px);
-  background:rgba(255,255,255,0.1);
+.card.visible{
+  opacity:1;
+  transform:translateY(0);
 }
 
 .card img{
   width:100%;
-  border-radius:8px;
+  border-radius:12px;
 }
 
-.card h3{
-  font-size:12px;
-  margin-top:8px;
+/* REVEAL */
+.reveal{
+  opacity:0;
+  transform:translateY(60px);
+  transition:1s;
 }
 
-.card span{
-  font-size:11px;
-  opacity:0.8;
-}
-
-/* FOOTER */
-footer{
-  text-align:center;
-  padding:30px;
-  opacity:0.5;
+.reveal.visible{
+  opacity:1;
+  transform:translateY(0);
 }
 </style>
 </head>
 
 <body>
 
+<div id="loader">
+  <div class="loader-disc"></div>
+</div>
+
 <nav>
-  <div class="logo">
-    <!-- ВАЖНО: положи logo.png в ту же папку что и index.html -->
-    <img src="./logo.png" alt="Vinyl Shop">
-    <span>Vinyl Shop</span>
-  </div>
+  <div>Vinyl Shop</div>
+  <button onclick="toggleTheme()">Theme</button>
 </nav>
 
 <section class="hero">
-  <video autoplay muted loop>
-    <source src="https://cdn.coverr.co/videos/coverr-vinyl-record-spinning-1902/1080p.mp4" type="video/mp4">
-  </video>
+  <div class="layer bg1" data-speed="0.2"></div>
+  <div class="layer bg2" data-speed="0.5"></div>
 
-  <div class="hero-content">
+  <div class="hero-content reveal">
     <h1>Музыка. Стиль. Атмосфера.</h1>
-    <p>Премиальные виниловые пластинки</p>
-
     <div class="vinyl"></div>
+    <button onclick="scrollToCatalog()">Каталог</button>
   </div>
 </section>
 
 <section class="section" id="catalog">
-  <h2>Каталог</h2>
+  <h2 class="reveal">Каталог</h2>
   <div class="products" id="products"></div>
 </section>
 
-<footer>
-© 2026 Vinyl Shop
-</footer>
-
 <script>
-async function loadProducts(){
-  try{
-    const res = await fetch('/api/products');
-    const data = await res.json();
-    const container=document.getElementById('products');
-    container.innerHTML='';
+// LOADER
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    document.getElementById("loader").style.opacity="0";
+    setTimeout(()=>loader.remove(),600);
+  },800);
+});
 
-    data.forEach(product=>{
-      container.innerHTML+=`
-        <div class="card">
-          <img src="${product.image}">
-          <h3>${product.name}</h3>
-          <span>${product.price} ₽</span>
-        </div>
-      `;
-    });
-  }catch(e){
-    console.log("Ошибка загрузки товаров");
-  }
+// THEME
+function toggleTheme(){
+  document.body.classList.toggle("light");
+}
+
+// PARALLAX
+window.addEventListener("scroll",()=>{
+  document.querySelectorAll(".layer").forEach(layer=>{
+    const speed=layer.getAttribute("data-speed");
+    layer.style.transform=`translateY(${window.scrollY * speed}px)`;
+  });
+});
+
+// REVEAL EFFECT
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add("visible");
+    }
+  });
+},{threshold:0.2});
+
+document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+
+// PRODUCTS LOAD
+async function loadProducts(){
+  const res=await fetch('/api/products');
+  const data=await res.json();
+  const container=document.getElementById("products");
+
+  data.forEach(product=>{
+    const div=document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
+      <img src="${product.image}">
+      <h3>${product.name}</h3>
+      <p>${product.price} ₽</p>
+    `;
+    container.appendChild(div);
+    observer.observe(div);
+  });
 }
 
 loadProducts();
+
+function scrollToCatalog(){
+  document.getElementById("catalog").scrollIntoView();
+}
 </script>
 
 </body>
