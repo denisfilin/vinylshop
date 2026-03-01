@@ -1,196 +1,235 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vinyl Shop</title>
 
-<style>
-:root {
-  --bg:#f5f5f7;
-  --text:#1d1d1f;
-  --card:rgba(255,255,255,0.7);
-  --accent:#0071e3;
-}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:#0f0f12;
-    --text:#fff;
-    --card:rgba(30,30,35,0.6);
-    --accent:#4da3ff;
-  }
+<style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
 }
 
 body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  transition:0.3s ease;
+  background:#000;
+  color:#fff;
   overflow-x:hidden;
 }
 
-.hero {
-  height:80vh;
+/* NAV */
+nav {
+  position:fixed;
+  top:0;
+  width:100%;
+  backdrop-filter: blur(20px);
+  background: rgba(0,0,0,0.5);
   display:flex;
-  flex-direction:column;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 50px;
+  z-index:1000;
+}
+
+nav img {
+  height:40px;
+}
+
+nav button {
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.3);
+  color:#fff;
+  padding:6px 12px;
+  border-radius:20px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+nav button:hover {
+  background:#fff;
+  color:#000;
+}
+
+/* HERO */
+.hero {
+  position:relative;
+  height:100vh;
+  display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
+  overflow:hidden;
+}
+
+.hero video {
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-2;
+}
+
+.hero::after {
+  content:'';
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.2),#000);
+  z-index:-1;
+}
+
+.hero-content {
+  transform:translateY(0);
+  transition:transform 0.2s ease-out;
 }
 
 .hero h1 {
-  font-size:60px;
-  margin:0;
-  opacity:0;
-  transform:translateY(40px);
-  transition:1s ease;
+  font-size:64px;
+  font-weight:800;
 }
 
 .hero p {
   font-size:20px;
   margin-top:20px;
-  opacity:0;
-  transform:translateY(40px);
-  transition:1.2s ease;
+  opacity:0.8;
 }
 
-.container {
-  max-width:1200px;
-  margin:60px auto;
-  padding:20px;
+/* PRODUCTS */
+.section {
+  padding:120px 10%;
 }
 
-.grid {
+.section h2 {
+  font-size:42px;
+  margin-bottom:60px;
+  text-align:center;
+}
+
+.products {
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:30px;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:40px;
 }
 
 .card {
-  background:var(--card);
+  background:rgba(255,255,255,0.05);
   backdrop-filter:blur(20px);
   border-radius:20px;
-  padding:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
-  transition:0.4s ease;
-  opacity:0;
-  transform:translateY(50px);
-}
-
-.card.visible {
-  opacity:1;
-  transform:translateY(0);
+  padding:30px;
+  transition:0.4s;
 }
 
 .card:hover {
-  transform:translateY(-10px) scale(1.02);
+  transform:translateY(-10px);
+  background:rgba(255,255,255,0.1);
 }
 
 .card img {
   width:100%;
   border-radius:15px;
-  margin-bottom:15px;
 }
 
-.title { font-weight:600; font-size:18px; }
-.price { color:var(--accent); margin:10px 0; }
-
-button {
-  padding:10px 18px;
-  border:none;
-  border-radius:20px;
-  background:var(--accent);
-  color:white;
-  cursor:pointer;
+.card h3 {
+  margin-top:20px;
 }
-button:hover { opacity:0.9; }
 
+.card p {
+  opacity:0.7;
+}
+
+.card span {
+  display:block;
+  margin-top:10px;
+  font-weight:600;
+}
+
+/* FOOTER */
 footer {
   text-align:center;
   padding:40px;
-  opacity:0.5;
+  background:#000;
+  opacity:0.6;
 }
 </style>
 </head>
 
 <body>
 
+<nav>
+  <img src="logo.png" alt="Vinyl Shop Logo">
+  <button onclick="toggleLang()">EN</button>
+</nav>
+
 <section class="hero">
-  <h1 id="heroTitle">Vinyl Shop</h1>
-  <p id="heroText">Музыка. Стиль. Атмосфера.</p>
+  <video autoplay muted loop>
+    <source src="https://cdn.coverr.co/videos/coverr-vinyl-record-spinning-1902/1080p.mp4" type="video/mp4">
+  </video>
+  <div class="hero-content" id="heroContent">
+    <h1 id="heroTitle">Музыка. Стиль. Атмосфера.</h1>
+    <p id="heroText">Премиальные виниловые пластинки для настоящих ценителей.</p>
+  </div>
 </section>
 
-<div class="container">
-  <div class="grid" id="products"></div>
-</div>
+<section class="section">
+  <h2 id="catalogTitle">Каталог</h2>
+  <div class="products" id="products"></div>
+</section>
 
 <footer>
   © 2026 Vinyl Shop
 </footer>
 
 <script>
-const heroTitle = document.getElementById('heroTitle');
-const heroText = document.getElementById('heroText');
-
-window.addEventListener('load',()=>{
-  heroTitle.style.opacity=1;
-  heroTitle.style.transform="translateY(0)";
-  heroText.style.opacity=1;
-  heroText.style.transform="translateY(0)";
+// Параллакс hero
+window.addEventListener("scroll", () => {
+  const offset = window.pageYOffset;
+  document.getElementById("heroContent").style.transform =
+    "translateY(" + offset * 0.4 + "px)";
 });
 
+// Загрузка товаров
 async function loadProducts(){
   const res = await fetch('/api/products');
   const data = await res.json();
   const container = document.getElementById('products');
+  container.innerHTML='';
 
-  data.forEach(p=>{
-    const card = document.createElement('div');
-    card.className="card";
-    card.innerHTML=`
-      <img src="${p.image}" />
-      <div class="title">${p.title}</div>
-      <div class="price">${p.price} ₽</div>
-      <button onclick="order('${p.title}','${p.price}')">
-        Заказать
-      </button>
+  data.forEach(product=>{
+    container.innerHTML += `
+      <div class="card">
+        <img src="${product.image}">
+        <h3>${product.name}</h3>
+        <p>${product.description || ''}</p>
+        <span>${product.price} ₽</span>
+      </div>
     `;
-    container.appendChild(card);
   });
-
-  revealOnScroll();
-}
-
-function revealOnScroll(){
-  const cards = document.querySelectorAll('.card');
-  const observer = new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('visible');
-      }
-    });
-  },{threshold:0.2});
-
-  cards.forEach(card=>observer.observe(card));
-}
-
-async function order(title,price){
-  const name = prompt("Ваше имя:");
-  const phone = prompt("Ваш телефон:");
-  if(!name || !phone) return;
-
-  await fetch('/api/send-order',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name,phone,product:title,price})
-  });
-
-  alert("Заказ отправлен!");
 }
 
 loadProducts();
+
+// Переключение языка
+let lang='ru';
+
+function toggleLang(){
+  if(lang==='ru'){
+    document.getElementById("heroTitle").innerText="Music. Style. Atmosphere.";
+    document.getElementById("heroText").innerText="Premium vinyl records for true collectors.";
+    document.getElementById("catalogTitle").innerText="Catalog";
+    document.querySelector("nav button").innerText="RU";
+    lang='en';
+  } else {
+    document.getElementById("heroTitle").innerText="Музыка. Стиль. Атмосфера.";
+    document.getElementById("heroText").innerText="Премиальные виниловые пластинки для настоящих ценителей.";
+    document.getElementById("catalogTitle").innerText="Каталог";
+    document.querySelector("nav button").innerText="EN";
+    lang='ru';
+  }
+}
 </script>
 
 </body>
