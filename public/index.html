@@ -21,21 +21,27 @@ href="data:image/svg+xml,
   --text:#fff;
   --card:rgba(255,255,255,0.06);
   --glass:rgba(255,255,255,0.08);
+  --accent:#21a038;
 }
+
 body.light{
   --bg:#f5f5f7;
   --text:#111;
   --card:rgba(0,0,0,0.05);
   --glass:rgba(255,255,255,0.7);
 }
+
 body{
   margin:0;
   background:var(--bg);
   color:var(--text);
   font-family:'Inter',sans-serif;
-  transition:0.4s;
+  transition:background 0.6s ease,color 0.6s ease;
   overflow-x:hidden;
 }
+
+/* SMOOTH SCROLL */
+html{scroll-behavior:smooth;}
 
 /* LOADER */
 .loader{
@@ -50,18 +56,18 @@ body{
 .loader.hidden{
   opacity:0;
   pointer-events:none;
-  transition:1s;
+  transition:1s ease;
 }
 .loader-vinyl{
-  width:140px;
-  height:140px;
+  width:150px;
+  height:150px;
   border-radius:50%;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 40%),
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 40%),
     radial-gradient(circle at center, #c00 12%, #111 13%, #000 60%);
   box-shadow:
-    inset 0 0 30px rgba(255,255,255,0.2),
-    0 0 40px rgba(255,255,255,0.3);
+    inset 0 0 40px rgba(255,255,255,0.25),
+    0 0 60px rgba(255,255,255,0.4);
   animation:spin 2s linear infinite;
 }
 
@@ -70,7 +76,7 @@ body{
   to{transform:rotate(360deg);}
 }
 
-/* TOP BG */
+/* BACKGROUND */
 .top-bg{
   position:absolute;
   top:0;
@@ -80,6 +86,7 @@ body{
   background:url('/brick-wall-background.avif') center/cover no-repeat;
   z-index:-1;
   filter:brightness(0.6);
+  transform:translateZ(0);
 }
 
 /* HEADER */
@@ -92,17 +99,46 @@ header{
   justify-content:space-between;
   align-items:center;
   padding:20px 40px;
-  backdrop-filter:blur(20px);
+  backdrop-filter:blur(25px);
   background:var(--glass);
   z-index:100;
+  transition:all .4s ease;
 }
+
+/* 🔵 ROUND LOGO */
 .logo{
   height:80px;
+  width:80px;
+  border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 20px rgba(0,0,0,0.5);
+  transition:0.4s ease;
 }
+.logo:hover{
+  transform:scale(1.05) rotate(5deg);
+}
+
+/* CONTROLS */
 .controls{
   display:flex;
   gap:15px;
   margin-right:80px;
+}
+
+button{
+  padding:8px 14px;
+  border-radius:30px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  transition:all .3s ease;
+  background:var(--card);
+  color:var(--text);
+  backdrop-filter:blur(10px);
+}
+button:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
 /* HERO */
@@ -114,38 +150,50 @@ header{
   flex-direction:column;
   text-align:center;
 }
+
 .hero h1{
   font-size:48px;
   margin-bottom:30px;
+  animation:fadeUp 1.2s ease;
 }
+
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(30px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
 .vinyl{
   margin-top:40px;
-  width:180px;
-  height:180px;
+  width:200px;
+  height:200px;
   border-radius:50%;
   background:
     radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 40%),
     radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
-  box-shadow:0 0 40px rgba(255,255,255,0.2);
-  animation:spin 8s linear infinite;
+  box-shadow:0 0 60px rgba(255,255,255,0.25);
+  animation:spin 10s linear infinite;
+  transition:transform .4s ease;
+}
+.vinyl:hover{
+  transform:scale(1.08);
 }
 
 /* CATALOG */
-.section{padding:100px 5%;}
+.section{padding:120px 5%;}
 .products{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:40px;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:50px;
   justify-items:center;
 }
 .card{
-  width:200px;
+  width:220px;
   background:var(--card);
-  padding:20px;
-  border-radius:20px;
+  padding:25px;
+  border-radius:25px;
   text-align:center;
   backdrop-filter:blur(20px);
-  transition:0.4s;
+  transition:all .4s ease;
   opacity:0;
   transform:translateY(40px);
 }
@@ -153,40 +201,53 @@ header{
   opacity:1;
   transform:translateY(0);
 }
+.card:hover{
+  transform:translateY(-10px) scale(1.05);
+  box-shadow:0 20px 50px rgba(0,0,0,0.4);
+}
 .card img{
   width:100%;
-  border-radius:12px;
+  border-radius:18px;
 }
 
-/* FLOATING CART + SBP */
+/* FLOATING BUTTONS */
 .cart,
 .sbp{
   position:fixed;
   bottom:30px;
-  width:70px;
-  height:70px;
+  width:75px;
+  height:75px;
   border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
   font-weight:bold;
   cursor:pointer;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
-  transition:0.3s;
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+  transition:all .4s ease;
+  font-size:20px;
 }
+
+/* CART */
 .cart{
   right:30px;
   background:#fff;
   color:#000;
 }
+.cart:hover{
+  transform:scale(1.15) rotate(-5deg);
+}
+
+/* 🟢 SBP AS SBER ICON */
 .sbp{
   right:120px;
-  background:#21a038;
+  background:radial-gradient(circle at 30% 30%, #2ecc71, var(--accent));
   color:#fff;
+  font-size:26px;
 }
-.cart:hover,
 .sbp:hover{
-  transform:scale(1.1);
+  transform:scale(1.15) rotate(8deg);
+  box-shadow:0 0 40px rgba(33,160,56,0.8);
 }
 </style>
 </head>
@@ -217,16 +278,12 @@ header{
   <div class="products" id="products"></div>
 </section>
 
-<!-- 🟢 SBP -->
-<div class="sbp" onclick="paySBP()">СБП</div>
-
-<!-- 🛒 CART -->
+<div class="sbp" onclick="paySBP()">🟢</div>
 <div class="cart" onclick="openCart()">🛒</div>
 
 <script>
 let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
 let currentLang='ru';
-
 updateCartUI();
 
 const translations={
@@ -236,8 +293,8 @@ const translations={
 
 function toggleLang(){
   currentLang=currentLang==='ru'?'en':'ru';
-  document.getElementById('heroTitle').innerText=translations[currentLang].hero;
-  document.getElementById('catalogTitle').innerText=translations[currentLang].catalog;
+  heroTitle.innerText=translations[currentLang].hero;
+  catalogTitle.innerText=translations[currentLang].catalog;
 }
 
 function toggleTheme(){
@@ -259,22 +316,16 @@ async function loadProducts(){
       <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
     `;
     container.appendChild(card);
-    setTimeout(()=>card.classList.add('show'),i*120);
+    setTimeout(()=>card.classList.add('show'),i*150);
   });
 
-  setTimeout(()=>{
-    document.getElementById('loader').classList.add('hidden');
-  },800);
+  setTimeout(()=>loader.classList.add('hidden'),1000);
 }
 
 function addToCart(product){
   cart.push(product);
-  saveCart();
+  localStorage.setItem("vinylCart",JSON.stringify(cart));
   updateCartUI();
-}
-
-function saveCart(){
-  localStorage.setItem("vinylCart", JSON.stringify(cart));
 }
 
 function updateCartUI(){
@@ -286,7 +337,7 @@ function openCart(){
 }
 
 function paySBP(){
-  window.open("https://www.sberbank.ru/ru/person/payments/sbp", "_blank");
+  window.open("https://www.sberbank.ru/ru/person/payments/sbp","_blank");
 }
 
 loadProducts();
