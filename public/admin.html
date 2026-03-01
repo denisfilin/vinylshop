@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Vinyl Shop — Pro Admin</title>
 
+<!-- 🎧 Тот же favicon что и на основном сайте -->
+<link rel="icon" type="image/svg+xml"
+href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<circle cx='50' cy='50' r='48' fill='black'/>
+<circle cx='50' cy='50' r='18' fill='red'/>
+<circle cx='50' cy='50' r='5' fill='white'/>
+</svg>">
+
 <style>
 :root {
   --bg: #f5f5f7;
@@ -12,14 +21,12 @@
   --text: #1d1d1f;
   --accent: #0071e3;
 }
-
 .dark {
   --bg: #0f0f12;
   --card: rgba(30,30,35,0.6);
   --text: #ffffff;
   --accent: #4da3ff;
 }
-
 body {
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
@@ -27,13 +34,11 @@ body {
   color:var(--text);
   transition:0.3s ease;
 }
-
 .container {
   max-width:1200px;
   margin:60px auto;
   padding:20px;
 }
-
 .glass {
   background:var(--card);
   backdrop-filter:blur(20px);
@@ -42,7 +47,6 @@ body {
   margin-bottom:30px;
   box-shadow:0 8px 32px rgba(0,0,0,0.1);
 }
-
 button {
   padding:10px 16px;
   border:none;
@@ -51,10 +55,8 @@ button {
   color:white;
   cursor:pointer;
 }
-
 button:hover { opacity:0.9; }
-
-input, textarea, select {
+input, textarea {
   width:100%;
   padding:10px;
   border-radius:12px;
@@ -62,37 +64,24 @@ input, textarea, select {
   margin-bottom:12px;
   background:rgba(255,255,255,0.5);
 }
-
-.dark input, .dark textarea, .dark select {
+.dark input, .dark textarea {
   background:rgba(255,255,255,0.1);
   color:white;
 }
-
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
   gap:20px;
 }
-
 .product img {
   width:100%;
   border-radius:12px;
   margin-bottom:10px;
 }
-
 .product-title { font-weight:600; }
 .product-price { color:var(--accent); margin-bottom:8px; }
-
-.stats {
-  display:flex;
-  gap:20px;
-}
-
-.stat-box {
-  flex:1;
-  text-align:center;
-}
-
+.stats { display:flex; gap:20px; }
+.stat-box { flex:1; text-align:center; }
 .drop-zone {
   border:2px dashed #aaa;
   padding:20px;
@@ -101,10 +90,7 @@ input, textarea, select {
   margin-bottom:10px;
   cursor:pointer;
 }
-
-.drop-zone.dragover {
-  border-color:var(--accent);
-}
+.drop-zone.dragover { border-color:var(--accent); }
 </style>
 </head>
 
@@ -130,16 +116,16 @@ input, textarea, select {
 
 <div class="glass">
   <h3>Добавить товар</h3>
-  <input id="title" placeholder="Название" />
-  <input id="price" placeholder="Цена" />
-  <input id="category" placeholder="Категория" />
-  <textarea id="description" placeholder="Описание"></textarea>
+  <input id="titleInput" placeholder="Название" />
+  <input id="priceInput" placeholder="Цена" />
+  <input id="categoryInput" placeholder="Категория" />
+  <textarea id="descriptionInput" placeholder="Описание"></textarea>
 
   <div class="drop-zone" id="dropZone">
     Перетащи изображение сюда или кликни
   </div>
   <input type="file" id="fileInput" hidden />
-  <input id="image" placeholder="Или вставь ссылку на изображение" />
+  <input id="imageInput" placeholder="Или вставь ссылку на изображение" />
 
   <button onclick="addProduct()">Добавить</button>
 </div>
@@ -161,16 +147,29 @@ function toggleTheme(){
   document.body.classList.toggle('dark');
 }
 
+/* =========================
+   УМНАЯ ЗАГРУЗКА БАЗЫ
+========================= */
 async function loadProducts(){
-  const res = await fetch('/api/products');
-  allProducts = await res.json();
+  try {
+    const res = await fetch('/api/products');
+    if(!res.ok) throw new Error("API not found");
+    allProducts = await res.json();
+  } catch(e) {
+    console.warn("API не найдено — используем localStorage");
+    allProducts = JSON.parse(localStorage.getItem("vinylProducts")) || [];
+  }
 
+  renderProducts();
+}
+
+function renderProducts(){
   const search = document.getElementById('search').value.toLowerCase();
   const filterCategory = document.getElementById('filterCategory').value.toLowerCase();
 
   const filtered = allProducts.filter(p =>
-    p.title.toLowerCase().includes(search) &&
-    p.category.toLowerCase().includes(filterCategory)
+    (p.title || "").toLowerCase().includes(search) &&
+    (p.category || "").toLowerCase().includes(filterCategory)
   );
 
   updateStats(filtered);
@@ -181,7 +180,7 @@ async function loadProducts(){
   filtered.forEach(p=>{
     container.innerHTML+=`
       <div class="glass product">
-        <img src="${p.image}" />
+        <img src="${p.image || ''}" />
         <div class="product-title">${p.title}</div>
         <div class="product-price">${p.price} ₽</div>
         <button onclick="deleteProduct(${p.id})">Удалить</button>
@@ -192,11 +191,13 @@ async function loadProducts(){
 
 function updateStats(products){
   document.getElementById('totalProducts').innerText = products.length;
-
   const total = products.reduce((sum,p)=> sum + Number(p.price||0),0);
   document.getElementById('totalValue').innerText = total + " ₽";
 }
 
+/* =========================
+   ДОБАВЛЕНИЕ ТОВАРА
+========================= */
 async function addProduct(){
   const title = titleInput.value.trim();
   const price = priceInput.value.trim();
@@ -206,24 +207,44 @@ async function addProduct(){
 
   if(!title || !price) return alert("Название и цена обязательны");
 
-  await fetch('/api/add-product',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({title,price,category,description,image})
-  });
+  const newProduct = {
+    id: Date.now(),
+    title, price, category, description, image
+  };
+
+  try {
+    await fetch('/api/add-product',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(newProduct)
+    });
+  } catch(e) {
+    let local = JSON.parse(localStorage.getItem("vinylProducts")) || [];
+    local.push(newProduct);
+    localStorage.setItem("vinylProducts", JSON.stringify(local));
+  }
 
   loadProducts();
 }
 
+/* =========================
+   УДАЛЕНИЕ
+========================= */
 async function deleteProduct(id){
-  await fetch(`/api/delete-product?id=${id}`,{method:'DELETE'});
+  try {
+    await fetch(`/api/delete-product?id=${id}`,{method:'DELETE'});
+  } catch(e) {
+    let local = JSON.parse(localStorage.getItem("vinylProducts")) || [];
+    local = local.filter(p=>p.id!==id);
+    localStorage.setItem("vinylProducts", JSON.stringify(local));
+  }
   loadProducts();
 }
 
 /* Drag & Drop */
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
-const imageInput = document.getElementById('image');
+const imageInput = document.getElementById('imageInput');
 
 dropZone.addEventListener('click',()=>fileInput.click());
 
