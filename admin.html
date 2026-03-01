@@ -1,83 +1,153 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>Админка | Vinyl Shop</title>
-  <style>
-    body {
-      font-family: Arial;
-      max-width: 900px;
-      margin: 40px auto;
-    }
+<meta charset="UTF-8" />
+<title>Vinyl Shop — Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    input, textarea {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
 
-    button {
-      padding: 8px 14px;
-      cursor: pointer;
-    }
+.container {
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 20px;
+}
 
-    .product {
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+  transition: 0.3s ease;
+}
 
-    img {
-      max-width: 120px;
-      display: block;
-      margin-bottom: 10px;
-    }
+.card:hover {
+  transform: translateY(-4px);
+}
 
-    #adminPanel {
-      display: none;
-    }
+h1 {
+  font-weight: 600;
+  margin-bottom: 40px;
+}
 
-    #loginBox {
-      text-align: center;
-      margin-top: 100px;
-    }
-  </style>
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+  font-size: 14px;
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  border-color: #0071e3;
+}
+
+button {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  background: #0071e3;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  background: #005ecb;
+}
+
+.delete-btn {
+  background: #ff3b30;
+}
+
+.delete-btn:hover {
+  background: #d92d23;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.product-card img {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.product-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.product-price {
+  color: #0071e3;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+#adminPanel { display: none; }
+
+.login-box {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  width: 320px;
+  text-align: center;
+}
+</style>
 </head>
+
 <body>
 
-<div id="loginBox">
-  <h2>Введите пароль</h2>
-  <input type="password" id="password" placeholder="Пароль" />
-  <button onclick="checkPassword()">Войти</button>
+<div id="loginBox" class="login-box">
+  <div class="card login-card">
+    <h2>Admin Login</h2>
+    <input type="password" id="password" placeholder="Введите пароль" />
+    <button onclick="checkPassword()">Войти</button>
+  </div>
 </div>
 
 <div id="adminPanel">
+  <div class="container">
 
-<h1>Админ-панель</h1>
+    <h1>Vinyl Shop — Админ</h1>
 
-<h2>Добавить товар</h2>
+    <div class="card">
+      <h3>Добавить товар</h3>
+      <input id="title" placeholder="Название" />
+      <input id="price" placeholder="Цена" />
+      <input id="category" placeholder="Категория" />
+      <textarea id="description" placeholder="Описание"></textarea>
+      <input id="image" placeholder="Ссылка на изображение" />
+      <button onclick="addProduct()">Добавить товар</button>
+    </div>
 
-<input id="title" placeholder="Название" />
-<input id="price" placeholder="Цена" />
-<input id="category" placeholder="Категория" />
-<textarea id="description" placeholder="Описание"></textarea>
-<input id="image" placeholder="Ссылка на изображение" />
+    <div class="grid" id="products"></div>
 
-<button onclick="addProduct()">Добавить</button>
-
-<hr>
-
-<h2>Список товаров</h2>
-<div id="products"></div>
-
+  </div>
 </div>
 
 <script>
-const ADMIN_PASSWORD = "Df221188"; // ← поменяй пароль здесь
+const ADMIN_PASSWORD = "vinyl2026";
 
 function checkPassword() {
   const input = document.getElementById('password').value;
-
   if (input === ADMIN_PASSWORD) {
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
@@ -90,18 +160,16 @@ function checkPassword() {
 async function loadProducts() {
   const res = await fetch('/api/products');
   const data = await res.json();
-
   const container = document.getElementById('products');
   container.innerHTML = '';
 
   data.forEach(product => {
     container.innerHTML += `
-      <div class="product">
-        <strong>${product.title}</strong><br>
-        Цена: ${product.price}<br>
-        Категория: ${product.category}<br>
+      <div class="card product-card">
         <img src="${product.image}" />
-        <button onclick="deleteProduct(${product.id})">
+        <div class="product-title">${product.title}</div>
+        <div class="product-price">${product.price} ₽</div>
+        <button class="delete-btn" onclick="deleteProduct(${product.id})">
           Удалить
         </button>
       </div>
@@ -128,9 +196,7 @@ async function addProduct() {
   });
 
   const result = await res.json();
-
   if (result.success) {
-    alert("Товар добавлен");
     loadProducts();
   } else {
     alert("Ошибка добавления");
@@ -145,9 +211,7 @@ async function deleteProduct(id) {
   });
 
   const result = await res.json();
-
   if (result.success) {
-    alert("Товар удалён");
     loadProducts();
   } else {
     alert("Ошибка удаления");
@@ -157,4 +221,3 @@ async function deleteProduct(id) {
 
 </body>
 </html>
-
