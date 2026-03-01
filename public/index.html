@@ -66,6 +66,22 @@ header{
   display:flex;
   gap:15px;
 }
+  /* ВРАЩАЮЩАЯСЯ ПЛАСТИНКА */
+.vinyl{
+  margin-top:40px;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
+  box-shadow:0 0 40px rgba(255,255,255,0.2);
+  animation:spin 8s linear infinite;
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
 
 button{
   padding:8px 14px;
