@@ -3,214 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vinyl Shop</title>
+<title>Admin • Vinyl Shop</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-<!-- 🎧 VINYL FAVICON -->
-<link rel="icon" type="image/svg+xml"
-href="data:image/svg+xml,
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-<circle cx='50' cy='50' r='48' fill='black'/>
-<circle cx='50' cy='50' r='18' fill='red'/>
-<circle cx='50' cy='50' r='5' fill='white'/>
-</svg>">
+<link rel="icon" href="/logo.png">
 
 <style>
 :root{
   --bg:#000;
+  --glass:rgba(0,0,0,0.6);
   --text:#fff;
-  --glass:rgba(255,255,255,0.08);
 }
 
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
   font-family:'Inter',sans-serif;
+  background:#000;
+  color:var(--text);
   overflow-x:hidden;
 }
 
-/* 🔥 BRICK WALL */
-.top-bg{
+/* 🔥 Кирпичная стена */
+.bg{
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  inset:0;
   background:url('/brick-wall-background.avif') center/cover no-repeat;
-  filter:brightness(0.5);
+  filter:brightness(0.4);
   z-index:-1;
 }
 
-/* HEADER */
 header{
-  position:fixed;
-  top:0;
-  width:100%;
   padding:20px 40px;
-  backdrop-filter:blur(25px);
+  backdrop-filter:blur(20px);
   background:var(--glass);
+  display:flex;
+  align-items:center;
+  gap:20px;
 }
 
 .logo{
-  height:80px;
-  width:80px;
+  width:60px;
+  height:60px;
   border-radius:50%;
   object-fit:cover;
-  box-shadow:0 0 20px rgba(0,0,0,0.5);
 }
 
-/* HERO */
-.hero{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
+h1{
+  margin:0;
+  font-size:22px;
 }
 
-.vinyl{
-  width:200px;
-  height:200px;
-  border-radius:50%;
-  margin-top:40px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 40%),
-    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
-  box-shadow:0 0 60px rgba(255,255,255,0.3);
-  animation:spin 10s linear infinite;
+.container{
+  padding:40px 8%;
 }
 
-@keyframes spin{
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
+.glass{
+  background:rgba(255,255,255,0.07);
+  backdrop-filter:blur(20px);
+  border-radius:25px;
+  padding:30px;
+  margin-bottom:40px;
 }
 
-/* PRODUCTS */
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin-bottom:12px;
+  border-radius:12px;
+  border:none;
+}
+
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.add-btn{
+  background:#fff;
+  color:#000;
+}
+
 .products{
-  padding:120px 5%;
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:40px;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:25px;
 }
 
 .card{
-  background:var(--glass);
-  backdrop-filter:blur(20px);
-  padding:25px;
-  border-radius:25px;
-  text-align:center;
-  transition:.4s ease;
+  background:rgba(255,255,255,0.08);
+  padding:20px;
+  border-radius:20px;
   position:relative;
-}
-
-.card:hover{
-  transform:translateY(-10px);
-  box-shadow:0 20px 50px rgba(0,0,0,0.6);
 }
 
 .card img{
   width:100%;
-  border-radius:18px;
+  border-radius:15px;
 }
 
-button{
-  margin-top:10px;
-  padding:8px 14px;
-  border:none;
-  border-radius:20px;
-  cursor:pointer;
-}
-
-/* TOOLTIP */
-.tooltip{
+.delete{
   position:absolute;
-  bottom:110%;
-  left:50%;
-  transform:translateX(-50%);
-  background:#111;
-  padding:12px;
-  border-radius:12px;
-  width:220px;
-  font-size:13px;
-  opacity:0;
-  transition:.3s ease;
-}
-.card:hover .tooltip{
-  opacity:1;
-}
-
-/* CART BUTTON */
-.cart{
-  position:fixed;
-  bottom:30px;
-  right:30px;
-  width:75px;
-  height:75px;
+  top:10px;
+  right:10px;
+  background:red;
+  color:#fff;
   border-radius:50%;
-  background:#fff;
-  color:#000;
+  width:28px;
+  height:28px;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
   font-weight:bold;
-  font-size:20px;
-  box-shadow:0 15px 40px rgba(0,0,0,0.6);
 }
 </style>
 </head>
 
 <body>
 
-<div class="top-bg"></div>
+<div class="bg"></div>
 
 <header>
   <img src="/logo.png" class="logo">
+  <h1>Админ панель</h1>
 </header>
 
-<section class="hero">
-  <h1>Музыка. Стиль. Атмосфера.</h1>
-  <div class="vinyl"></div>
-</section>
+<div class="container">
 
-<section class="products" id="products"></section>
+  <div class="glass">
+    <h2>Добавить товар</h2>
 
-<div class="cart" onclick="window.location.href='cart.html'">🛒</div>
+    <input type="text" id="title" placeholder="Название">
+    <input type="number" id="price" placeholder="Цена">
+    <textarea id="description" placeholder="Описание"></textarea>
+    <input type="text" id="image" placeholder="URL изображения">
+
+    <button class="add-btn" onclick="addProduct()">Добавить</button>
+  </div>
+
+  <div class="glass">
+    <h2>Список товаров</h2>
+    <div class="products" id="products"></div>
+  </div>
+
+</div>
 
 <script>
-let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
-
 async function loadProducts(){
-  try{
-    const res = await fetch('/api/products');
-    const data = await res.json();
+  const res = await fetch('/api/products');
+  const data = await res.json();
+  const container = document.getElementById("products");
+  container.innerHTML="";
 
-    const container = document.getElementById('products');
-    container.innerHTML="";
+  data.forEach(product=>{
+    const card=document.createElement("div");
+    card.className="card";
 
-    data.forEach(product=>{
-      const card=document.createElement('div');
-      card.className="card";
+    card.innerHTML=`
+      <div class="delete" onclick="deleteProduct('${product.id}')">×</div>
+      <img src="${product.image}">
+      <h3>${product.title}</h3>
+      <p>${product.price} ₽</p>
+      <small>${product.description || ""}</small>
+    `;
 
-      card.innerHTML=`
-        <img src="${product.image}">
-        <h3>${product.title}</h3>
-        <p>${product.price} ₽</p>
-        <div class="tooltip">${product.description || ""}</div>
-        <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
-      `;
-      container.appendChild(card);
-    });
-
-  }catch(e){ console.log("API error"); }
+    container.appendChild(card);
+  });
 }
 
-function addToCart(product){
-  cart.push(product);
-  localStorage.setItem("vinylCart",JSON.stringify(cart));
+async function addProduct(){
+  const title=document.getElementById("title").value;
+  const price=document.getElementById("price").value;
+  const description=document.getElementById("description").value;
+  const image=document.getElementById("image").value;
+
+  if(!title || !price || !image){
+    alert("Заполните обязательные поля");
+    return;
+  }
+
+  await fetch('/api/products',{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      id:Date.now().toString(),
+      title,
+      price,
+      description,
+      image
+    })
+  });
+
+  document.getElementById("title").value="";
+  document.getElementById("price").value="";
+  document.getElementById("description").value="";
+  document.getElementById("image").value="";
+
+  loadProducts();
+}
+
+async function deleteProduct(id){
+  await fetch('/api/products',{
+    method:"DELETE",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ id })
+  });
+
+  loadProducts();
 }
 
 loadProducts();
