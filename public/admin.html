@@ -8,64 +8,71 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="icon" href="/logo.png">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 :root{
   --bg:#000;
+  --glass:rgba(0,0,0,0.6);
   --text:#fff;
-  --glass:rgba(0,0,0,0.65);
 }
-body.light{
-  --bg:#f3f3f3;
-  --text:#000;
-  --glass:rgba(255,255,255,0.65);
-}
+
 body{
   margin:0;
   font-family:'Inter',sans-serif;
-  background:var(--bg);
+  background:#000;
   color:var(--text);
-  transition:.3s;
+  overflow-x:hidden;
 }
+
+/* 🔥 Кирпичная стена */
 .bg{
   position:fixed;
   inset:0;
   background:url('/brick-wall-background.avif') center/cover no-repeat;
-  filter:brightness(.4);
+  filter:brightness(0.4);
   z-index:-1;
 }
+
 header{
   padding:20px 40px;
   backdrop-filter:blur(20px);
   background:var(--glass);
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  gap:20px;
 }
+
 .logo{
   width:60px;
   height:60px;
   border-radius:50%;
   object-fit:cover;
 }
+
+h1{
+  margin:0;
+  font-size:22px;
+}
+
 .container{
   padding:40px 8%;
 }
+
 .glass{
-  background:var(--glass);
+  background:rgba(255,255,255,0.07);
   backdrop-filter:blur(20px);
   border-radius:25px;
   padding:30px;
   margin-bottom:40px;
 }
-input,textarea{
+
+input, textarea{
   width:100%;
-  padding:12px;
+  padding:10px;
   margin-bottom:12px;
   border-radius:12px;
   border:none;
 }
+
 button{
   padding:10px 18px;
   border:none;
@@ -73,21 +80,30 @@ button{
   cursor:pointer;
   font-weight:600;
 }
+
+.add-btn{
+  background:#fff;
+  color:#000;
+}
+
 .products{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:25px;
 }
+
 .card{
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.08);
   padding:20px;
   border-radius:20px;
   position:relative;
 }
+
 .card img{
   width:100%;
   border-radius:15px;
 }
+
 .delete{
   position:absolute;
   top:10px;
@@ -101,154 +117,105 @@ button{
   justify-content:center;
   align-items:center;
   cursor:pointer;
-}
-.theme{
-  cursor:pointer;
-  font-size:18px;
-}
-.login{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-.login-box{
-  background:#111;
-  padding:40px;
-  border-radius:20px;
-  width:320px;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="login" id="loginBox">
-  <div class="login-box">
-    <h3 style="color:white">Вход в админку</h3>
-    <input type="password" id="password" placeholder="Пароль">
-    <button onclick="login()">Войти</button>
-  </div>
-</div>
-
 <div class="bg"></div>
 
 <header>
-  <div style="display:flex;align-items:center;gap:15px">
-    <img src="/logo.png" class="logo">
-    <h2>Админка</h2>
-  </div>
-  <div class="theme" onclick="toggleTheme()">🌗</div>
+  <img src="/logo.png" class="logo">
+  <h1>Админ панель</h1>
 </header>
 
 <div class="container">
 
   <div class="glass">
-    <h3>Добавить товар</h3>
-    <input id="title" placeholder="Название">
-    <input id="price" type="number" placeholder="Цена">
+    <h2>Добавить товар</h2>
+
+    <input type="text" id="title" placeholder="Название">
+    <input type="number" id="price" placeholder="Цена">
     <textarea id="description" placeholder="Описание"></textarea>
-    <input id="image" placeholder="URL изображения">
-    <button onclick="addProduct()">Добавить</button>
+    <input type="text" id="image" placeholder="URL изображения">
+
+    <button class="add-btn" onclick="addProduct()">Добавить</button>
   </div>
 
   <div class="glass">
-    <h3>Список товаров</h3>
+    <h2>Список товаров</h2>
     <div class="products" id="products"></div>
   </div>
 
 </div>
 
 <script>
-/* 🔥 ВСТАВЬ СВОИ ДАННЫЕ */
-const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"
-const SUPABASE_KEY = "YOUR_PUBLIC_ANON_KEY"
-
-/* 🔐 ПАРОЛЬ */
-const ADMIN_PASSWORD = "vinyl2025"
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-
-/* LOGIN */
-function login(){
-  const value = document.getElementById("password").value
-  if(value === ADMIN_PASSWORD){
-    document.getElementById("loginBox").style.display="none"
-  } else {
-    alert("Неверный пароль")
-  }
-}
-
-/* LOAD PRODUCTS */
 async function loadProducts(){
-  const { data, error } = await supabase.from("products").select("*")
-  if(error){
-    alert("Ошибка подключения к Supabase")
-    return
-  }
-
-  const container=document.getElementById("products")
-  container.innerHTML=""
+  const res = await fetch('/api/products');
+  const data = await res.json();
+  const container = document.getElementById("products");
+  container.innerHTML="";
 
   data.forEach(product=>{
-    const card=document.createElement("div")
-    card.className="card"
+    const card=document.createElement("div");
+    card.className="card";
 
     card.innerHTML=`
       <div class="delete" onclick="deleteProduct('${product.id}')">×</div>
       <img src="${product.image}">
-      <h4>${product.title}</h4>
+      <h3>${product.title}</h3>
       <p>${product.price} ₽</p>
-    `
+      <small>${product.description || ""}</small>
+    `;
 
-    container.appendChild(card)
-  })
+    container.appendChild(card);
+  });
 }
 
-/* ADD PRODUCT */
 async function addProduct(){
-  const title=document.getElementById("title").value
-  const price=document.getElementById("price").value
-  const description=document.getElementById("description").value
-  const image=document.getElementById("image").value
+  const title=document.getElementById("title").value;
+  const price=document.getElementById("price").value;
+  const description=document.getElementById("description").value;
+  const image=document.getElementById("image").value;
 
   if(!title || !price || !image){
-    alert("Заполните обязательные поля")
-    return
+    alert("Заполните обязательные поля");
+    return;
   }
 
-  const { error } = await supabase.from("products").insert([
-    { title, price, description, image }
-  ])
+  await fetch('/api/products',{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      id:Date.now().toString(),
+      title,
+      price,
+      description,
+      image
+    })
+  });
 
-  if(error){
-    alert("Ошибка добавления")
-    return
-  }
+  document.getElementById("title").value="";
+  document.getElementById("price").value="";
+  document.getElementById("description").value="";
+  document.getElementById("image").value="";
 
-  loadProducts()
+  loadProducts();
 }
 
-/* DELETE */
 async function deleteProduct(id){
-  const { error } = await supabase.from("products").delete().eq("id", id)
-  if(error){
-    alert("Ошибка удаления")
-    return
-  }
+  await fetch('/api/products',{
+    method:"DELETE",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ id })
+  });
 
-  loadProducts()
+  loadProducts();
 }
 
-/* THEME */
-function toggleTheme(){
-  document.body.classList.toggle("light")
-}
-
-loadProducts()
+loadProducts();
 </script>
 
 </body>
