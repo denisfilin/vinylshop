@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<title> Admin - Vinyl Shop</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinyl Shop</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<!-- 🎧 VINYL FAVICON -->
 <link rel="icon" type="image/svg+xml"
 href="data:image/svg+xml,
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
@@ -11,220 +16,204 @@ href="data:image/svg+xml,
 <circle cx='50' cy='50' r='5' fill='white'/>
 </svg>">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  background: #f5f5f7;
-  color: #1d1d1f;
+:root{
+  --bg:#000;
+  --text:#fff;
+  --glass:rgba(255,255,255,0.08);
 }
 
-.container {
-  max-width: 1100px;
-  margin: 60px auto;
-  padding: 20px;
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
 }
 
-.card {
-  background: white;
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  margin-bottom: 30px;
-  transition: 0.3s ease;
+/* 🔥 BRICK WALL */
+.top-bg{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:url('/brick-wall-background.avif') center/cover no-repeat;
+  filter:brightness(0.5);
+  z-index:-1;
 }
 
-.card:hover {
-  transform: translateY(-4px);
+/* HEADER */
+header{
+  position:fixed;
+  top:0;
+  width:100%;
+  padding:20px 40px;
+  backdrop-filter:blur(25px);
+  background:var(--glass);
 }
 
-h1 {
-  font-weight: 600;
-  margin-bottom: 40px;
+.logo{
+  height:80px;
+  width:80px;
+  border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 20px rgba(0,0,0,0.5);
 }
 
-input, textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  margin-bottom: 15px;
-  font-size: 14px;
-  outline: none;
+/* HERO */
+.hero{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
 }
 
-input:focus, textarea:focus {
-  border-color: #0071e3;
+.vinyl{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  margin-top:40px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 40%),
+    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
+  box-shadow:0 0 60px rgba(255,255,255,0.3);
+  animation:spin 10s linear infinite;
 }
 
-button {
-  padding: 10px 18px;
-  border-radius: 20px;
-  border: none;
-  background: #0071e3;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s ease;
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
 }
 
-button:hover {
-  background: #005ecb;
+/* PRODUCTS */
+.products{
+  padding:120px 5%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:40px;
 }
 
-.delete-btn {
-  background: #ff3b30;
+.card{
+  background:var(--glass);
+  backdrop-filter:blur(20px);
+  padding:25px;
+  border-radius:25px;
+  text-align:center;
+  transition:.4s ease;
+  position:relative;
 }
 
-.delete-btn:hover {
-  background: #d92d23;
+.card:hover{
+  transform:translateY(-10px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.6);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+.card img{
+  width:100%;
+  border-radius:18px;
 }
 
-.product-card img {
-  width: 100%;
-  border-radius: 14px;
-  margin-bottom: 10px;
+button{
+  margin-top:10px;
+  padding:8px 14px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
 }
 
-.product-title {
-  font-weight: 600;
-  margin-bottom: 6px;
+/* TOOLTIP */
+.tooltip{
+  position:absolute;
+  bottom:110%;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  padding:12px;
+  border-radius:12px;
+  width:220px;
+  font-size:13px;
+  opacity:0;
+  transition:.3s ease;
+}
+.card:hover .tooltip{
+  opacity:1;
 }
 
-.product-price {
-  color: #0071e3;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-#adminPanel { display: none; }
-
-.login-box {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-card {
-  width: 320px;
-  text-align: center;
+/* CART BUTTON */
+.cart{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  width:75px;
+  height:75px;
+  border-radius:50%;
+  background:#fff;
+  color:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
 }
 </style>
 </head>
 
 <body>
 
-<div id="loginBox" class="login-box">
-  <div class="card login-card">
-    <h2>Admin Login</h2>
-    <input type="password" id="password" placeholder="Введите пароль" />
-    <button onclick="checkPassword()">Войти</button>
-  </div>
-</div>
+<div class="top-bg"></div>
 
-<div id="adminPanel">
-  <div class="container">
+<header>
+  <img src="/logo.png" class="logo">
+</header>
 
-    <h1>Admin - Vinyl Shop</h1>
+<section class="hero">
+  <h1>Музыка. Стиль. Атмосфера.</h1>
+  <div class="vinyl"></div>
+</section>
 
-    <div class="card">
-      <h3>Добавить товар</h3>
-      <input id="title" placeholder="Название" />
-      <input id="price" placeholder="Цена" />
-      <input id="category" placeholder="Категория" />
-      <textarea id="description" placeholder="Описание"></textarea>
-      <input id="image" placeholder="Ссылка на изображение" />
-      <button onclick="addProduct()">Добавить товар</button>
-    </div>
+<section class="products" id="products"></section>
 
-    <div class="grid" id="products"></div>
-
-  </div>
-</div>
+<div class="cart" onclick="window.location.href='cart.html'">🛒</div>
 
 <script>
-const ADMIN_PASSWORD = "Df221188";
+let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
 
-function checkPassword() {
-  const input = document.getElementById('password').value;
-  if (input === ADMIN_PASSWORD) {
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-    loadProducts();
-  } else {
-    alert("Неверный пароль");
-  }
+async function loadProducts(){
+  try{
+    const res = await fetch('/api/products');
+    const data = await res.json();
+
+    const container = document.getElementById('products');
+    container.innerHTML="";
+
+    data.forEach(product=>{
+      const card=document.createElement('div');
+      card.className="card";
+
+      card.innerHTML=`
+        <img src="${product.image}">
+        <h3>${product.title}</h3>
+        <p>${product.price} ₽</p>
+        <div class="tooltip">${product.description || ""}</div>
+        <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
+      `;
+      container.appendChild(card);
+    });
+
+  }catch(e){ console.log("API error"); }
 }
 
-async function loadProducts() {
-  const res = await fetch('/api/products');
-  const data = await res.json();
-  const container = document.getElementById('products');
-  container.innerHTML = '';
-
-  data.forEach(product => {
-    container.innerHTML += `
-      <div class="card product-card">
-        <img src="${product.image}" />
-        <div class="product-title">${product.title}</div>
-        <div class="product-price">${product.price} ₽</div>
-        <button class="delete-btn" onclick="deleteProduct(${product.id})">
-          Удалить
-        </button>
-      </div>
-    `;
-  });
+function addToCart(product){
+  cart.push(product);
+  localStorage.setItem("vinylCart",JSON.stringify(cart));
 }
 
-async function addProduct() {
-  const title = document.getElementById('title').value.trim();
-  const price = document.getElementById('price').value.trim();
-  const category = document.getElementById('category').value.trim();
-  const description = document.getElementById('description').value.trim();
-  const image = document.getElementById('image').value.trim();
-
-  if (!title || !price) {
-    alert("Название и цена обязательны");
-    return;
-  }
-
-  const res = await fetch('/api/add-product', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, price, category, description, image })
-  });
-
-  const result = await res.json();
-  if (result.success) {
-    loadProducts();
-  } else {
-    alert("Ошибка добавления");
-  }
-}
-
-async function deleteProduct(id) {
-  if (!confirm("Удалить товар?")) return;
-
-  const res = await fetch(`/api/delete-product?id=${id}`, {
-    method: 'DELETE'
-  });
-
-  const result = await res.json();
-  if (result.success) {
-    loadProducts();
-  } else {
-    alert("Ошибка удаления");
-  }
-}
+loadProducts();
 </script>
 
 </body>
