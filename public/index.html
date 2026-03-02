@@ -7,28 +7,11 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-<link rel="icon" type="image/svg+xml"
-href="data:image/svg+xml,
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-<circle cx='50' cy='50' r='48' fill='black'/>
-<circle cx='50' cy='50' r='18' fill='red'/>
-<circle cx='50' cy='50' r='5' fill='white'/>
-</svg>">
-
 <style>
 :root{
   --bg:#000;
   --text:#fff;
   --card:rgba(255,255,255,0.06);
-  --glass:rgba(255,255,255,0.08);
-  --accent:#21a038;
-}
-
-body.light{
-  --bg:#f5f5f7;
-  --text:#111;
-  --card:rgba(0,0,0,0.05);
-  --glass:rgba(255,255,255,0.7);
 }
 
 body{
@@ -36,57 +19,7 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:'Inter',sans-serif;
-  transition:background 0.6s ease,color 0.6s ease;
   overflow-x:hidden;
-}
-
-/* SMOOTH SCROLL */
-html{scroll-behavior:smooth;}
-
-/* LOADER */
-.loader{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
-.loader.hidden{
-  opacity:0;
-  pointer-events:none;
-  transition:1s ease;
-}
-.loader-vinyl{
-  width:150px;
-  height:150px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 40%),
-    radial-gradient(circle at center, #c00 12%, #111 13%, #000 60%);
-  box-shadow:
-    inset 0 0 40px rgba(255,255,255,0.25),
-    0 0 60px rgba(255,255,255,0.4);
-  animation:spin 2s linear infinite;
-}
-
-@keyframes spin{
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
-}
-
-/* BACKGROUND */
-.top-bg{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:600px;
-  background:url('/brick-wall-background.avif') center/cover no-repeat;
-  z-index:-1;
-  filter:brightness(0.6);
-  transform:translateZ(0);
 }
 
 /* HEADER */
@@ -100,272 +33,148 @@ header{
   align-items:center;
   padding:20px 40px;
   backdrop-filter:blur(25px);
-  background:var(--glass);
+  background:rgba(0,0,0,0.6);
   z-index:100;
-  transition:all .4s ease;
 }
 
-/* 🔵 ROUND LOGO */
 .logo{
-  height:80px;
-  width:80px;
+  height:70px;
+  width:70px;
   border-radius:50%;
   object-fit:cover;
-  box-shadow:0 0 20px rgba(0,0,0,0.5);
-  transition:0.4s ease;
-}
-.logo:hover{
-  transform:scale(1.05) rotate(5deg);
 }
 
-/* CONTROLS */
-.controls{
-  display:flex;
-  gap:15px;
-  margin-right:80px;
-}
-
-button{
-  padding:8px 14px;
-  border-radius:30px;
-  border:none;
-  cursor:pointer;
-  font-weight:600;
-  transition:all .3s ease;
-  background:var(--card);
-  color:var(--text);
-  backdrop-filter:blur(10px);
-}
-button:hover{
-  transform:translateY(-3px) scale(1.05);
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
-}
-
-/* HERO */
 .hero{
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  text-align:center;
 }
 
-.hero h1{
-  font-size:48px;
-  margin-bottom:30px;
-  animation:fadeUp 1.2s ease;
-}
-
-@keyframes fadeUp{
-  from{opacity:0; transform:translateY(30px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-.vinyl{
-  margin-top:40px;
-  width:200px;
-  height:200px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 40%),
-    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
-  box-shadow:0 0 60px rgba(255,255,255,0.25);
-  animation:spin 10s linear infinite;
-  transition:transform .4s ease;
-}
-.vinyl:hover{
-  transform:scale(1.08);
-}
-
-/* CATALOG */
-.section{padding:120px 5%;}
 .products{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:50px;
-  justify-items:center;
+  padding:120px 5%;
 }
+
 .card{
   width:220px;
   background:var(--card);
   padding:25px;
   border-radius:25px;
   text-align:center;
-  backdrop-filter:blur(20px);
-  transition:all .4s ease;
-  opacity:0;
-  transform:translateY(40px);
+  position:relative;
+  transition:0.4s ease;
 }
-.card.show{
-  opacity:1;
-  transform:translateY(0);
-}
+
 .card:hover{
-  transform:translateY(-10px) scale(1.05);
-  box-shadow:0 20px 50px rgba(0,0,0,0.4);
+  transform:translateY(-10px);
 }
+
 .card img{
   width:100%;
   border-radius:18px;
 }
 
-/* FLOATING BUTTONS */
-.cart,
-.sbp{
+/* 🔥 TOOLTIP DESCRIPTION */
+.tooltip{
+  position:absolute;
+  bottom:110%;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  padding:10px;
+  border-radius:10px;
+  width:200px;
+  font-size:12px;
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s ease;
+}
+
+.card:hover .tooltip{
+  opacity:1;
+}
+
+/* CART BUTTON */
+.cart{
   position:fixed;
   bottom:30px;
+  right:30px;
   width:75px;
   height:75px;
   border-radius:50%;
+  background:#fff;
+  color:#000;
   display:flex;
   justify-content:center;
   align-items:center;
-  font-weight:bold;
   cursor:pointer;
-  box-shadow:0 15px 40px rgba(0,0,0,0.6);
-  transition:all .4s ease;
+  font-weight:bold;
   font-size:20px;
-}
-
-/* CART */
-.cart{
-  right:30px;
-  background:#fff;
-  color:#000;
-}
-.cart:hover{
-  transform:scale(1.15) rotate(-5deg);
-}
-
-/* 🟢 SBP AS SBER ICON */
-.sbp{
-  right:120px;
-  background:radial-gradient(circle at 30% 30%, #2ecc71, var(--accent));
-  color:#fff;
-  font-size:26px;
-}
-.sbp:hover{
-  transform:scale(1.15) rotate(8deg);
-  box-shadow:0 0 40px rgba(33,160,56,0.8);
 }
 </style>
 </head>
 
 <body>
 
-<div class="loader" id="loader">
-  <div class="loader-vinyl"></div>
-</div>
-
-<div class="top-bg"></div>
-
 <header>
   <img src="/logo.png" class="logo">
-  <div class="controls">
-    <button onclick="toggleLang()">RU / EN</button>
-    <button onclick="toggleTheme()">🌗</button>
-  </div>
 </header>
 
 <section class="hero">
-  <h1 id="heroTitle">Музыка. Стиль. Атмосфера.</h1>
-  <div class="vinyl"></div>
+  <h1>Музыка. Стиль. Атмосфера.</h1>
 </section>
 
-<section class="section">
-  <h2 id="catalogTitle">Каталог</h2>
-  <div class="products" id="products"></div>
-</section>
+<section class="products" id="products"></section>
 
-<div class="sbp" onclick="paySBP()">🟢</div>
 <div class="cart" onclick="openCart()">🛒</div>
 
 <script>
 let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
-let currentLang='ru';
-updateCartUI();
-
-const translations={
-  ru:{hero:"Музыка. Стиль. Атмосфера.",catalog:"Каталог"},
-  en:{hero:"Music. Style. Atmosphere.",catalog:"Catalog"}
-};
-
-function toggleLang(){
-  currentLang=currentLang==='ru'?'en':'ru';
-  heroTitle.innerText=translations[currentLang].hero;
-  catalogTitle.innerText=translations[currentLang].catalog;
-}
-
-function toggleTheme(){
-  document.body.classList.toggle('light');
-}
 
 async function loadProducts(){
   try{
-    const res=await fetch('/api/products');
-    const data=await res.json();
-    const container=document.getElementById('products');
+    const res = await fetch('/api/products');
+    let data = await res.json();
+
+    const container = document.getElementById('products');
     container.innerHTML="";
 
-    data.forEach((product,i)=>{
+    data.forEach(product=>{
+      const name = product.title || product.name || "Vinyl";
+      const price = product.price || 0;
+      const image = product.image || "";
+      const description = product.description || "Описание отсутствует";
 
-      // 🔥 Фикс undefined
-      const name = product.name || product.title || "Vinyl Record";
-      const price = product.price || product.cost || 0;
-      const image = product.image || product.image_url || product.img || "/placeholder.jpg";
-
-      const card=document.createElement('div');
-      card.className='card';
+      const card = document.createElement('div');
+      card.className="card";
 
       card.innerHTML=`
-        <img src="${image}" alt="${name}">
+        <img src="${image}">
         <h3>${name}</h3>
         <p>${price} ₽</p>
-        <button onclick='addToCart(${JSON.stringify({
-          name:name,
-          price:price,
-          image:image
-        })})'>+</button>
+        <div class="tooltip">${description}</div>
+        <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
       `;
 
       container.appendChild(card);
-      setTimeout(()=>card.classList.add('show'),i*150);
     });
 
-  }catch(err){
-    console.error("Ошибка загрузки:",err);
+  }catch(e){
+    console.log("API not found");
   }
-
-  setTimeout(()=>loader.classList.add('hidden'),1000);
 }
 
 function addToCart(product){
   cart.push(product);
-  localStorage.setItem("vinylCart",JSON.stringify(cart));
-  updateCartUI();
-}
-
-function updateCartUI(){
-  document.querySelector('.cart').innerText="🛒 "+cart.length;
+  localStorage.setItem("vinylCart", JSON.stringify(cart));
 }
 
 function openCart(){
-  if(cart.length===0){
-    alert("Корзина пуста");
-    return;
-  }
-
-  let text="Корзина:\n\n";
-  cart.forEach((item,i)=>{
-    text+=`${i+1}. ${item.name} — ${item.price} ₽\n`;
-  });
-
-  alert(text);
-}
-
-function paySBP(){
-  window.open("https://www.sberbank.ru/ru/person/payments/sbp","_blank");
+  window.location.href="cart.html";
 }
 
 loadProducts();
