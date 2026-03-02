@@ -14,15 +14,13 @@
 :root{
   --bg:#000;
   --text:#fff;
-  --glass:rgba(0,0,0,0.6);
+  --glass:rgba(0,0,0,0.65);
 }
-
 body.light{
-  --bg:#f5f5f5;
+  --bg:#f3f3f3;
   --text:#000;
-  --glass:rgba(255,255,255,0.6);
+  --glass:rgba(255,255,255,0.65);
 }
-
 body{
   margin:0;
   font-family:'Inter',sans-serif;
@@ -30,15 +28,13 @@ body{
   color:var(--text);
   transition:.3s;
 }
-
 .bg{
   position:fixed;
   inset:0;
   background:url('/brick-wall-background.avif') center/cover no-repeat;
-  filter:brightness(0.4);
+  filter:brightness(.4);
   z-index:-1;
 }
-
 header{
   padding:20px 40px;
   backdrop-filter:blur(20px);
@@ -47,18 +43,15 @@ header{
   justify-content:space-between;
   align-items:center;
 }
-
 .logo{
   width:60px;
   height:60px;
   border-radius:50%;
   object-fit:cover;
 }
-
 .container{
   padding:40px 8%;
 }
-
 .glass{
   background:var(--glass);
   backdrop-filter:blur(20px);
@@ -66,15 +59,13 @@ header{
   padding:30px;
   margin-bottom:40px;
 }
-
-input, textarea{
+input,textarea{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-bottom:12px;
   border-radius:12px;
   border:none;
 }
-
 button{
   padding:10px 18px;
   border:none;
@@ -82,25 +73,21 @@ button{
   cursor:pointer;
   font-weight:600;
 }
-
 .products{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:25px;
 }
-
 .card{
   background:rgba(255,255,255,0.1);
   padding:20px;
   border-radius:20px;
   position:relative;
 }
-
 .card img{
   width:100%;
   border-radius:15px;
 }
-
 .delete{
   position:absolute;
   top:10px;
@@ -115,13 +102,11 @@ button{
   align-items:center;
   cursor:pointer;
 }
-
-.theme-toggle{
+.theme{
   cursor:pointer;
   font-size:18px;
 }
-
-.login-screen{
+.login{
   position:fixed;
   inset:0;
   background:#000;
@@ -130,24 +115,22 @@ button{
   align-items:center;
   z-index:999;
 }
-
 .login-box{
   background:#111;
   padding:40px;
   border-radius:20px;
-  width:300px;
+  width:320px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔐 LOGIN -->
-<div class="login-screen" id="loginScreen">
+<div class="login" id="loginBox">
   <div class="login-box">
-    <h3 style="color:white">Admin Login</h3>
-    <input type="password" id="adminPassword" placeholder="Пароль">
-    <button onclick="checkPassword()">Войти</button>
+    <h3 style="color:white">Вход в админку</h3>
+    <input type="password" id="password" placeholder="Пароль">
+    <button onclick="login()">Войти</button>
   </div>
 </div>
 
@@ -158,54 +141,57 @@ button{
     <img src="/logo.png" class="logo">
     <h2>Админка</h2>
   </div>
-  <div class="theme-toggle" onclick="toggleTheme()">🌗</div>
+  <div class="theme" onclick="toggleTheme()">🌗</div>
 </header>
 
 <div class="container">
 
   <div class="glass">
     <h3>Добавить товар</h3>
-    <input type="text" id="title" placeholder="Название">
-    <input type="number" id="price" placeholder="Цена">
+    <input id="title" placeholder="Название">
+    <input id="price" type="number" placeholder="Цена">
     <textarea id="description" placeholder="Описание"></textarea>
-    <input type="text" id="image" placeholder="URL изображения">
+    <input id="image" placeholder="URL изображения">
     <button onclick="addProduct()">Добавить</button>
   </div>
 
   <div class="glass">
-    <h3>Товары</h3>
+    <h3>Список товаров</h3>
     <div class="products" id="products"></div>
   </div>
 
 </div>
 
 <script>
-// 🔥 ВСТАВЬ СВОИ ДАННЫЕ
-const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
-const SUPABASE_KEY = "sb_publishable_LaKsiiHyowziPgGTl5CdWA_beMfguyx"
+/* 🔥 ВСТАВЬ СВОИ ДАННЫЕ */
+const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"
+const SUPABASE_KEY = "YOUR_PUBLIC_ANON_KEY"
+
+/* 🔐 ПАРОЛЬ */
+const ADMIN_PASSWORD = "vinyl2025"
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-const ADMIN_PASSWORD = "Df221188" // можно поменять
-
-function checkPassword(){
-  const value = document.getElementById("adminPassword").value
+/* LOGIN */
+function login(){
+  const value = document.getElementById("password").value
   if(value === ADMIN_PASSWORD){
-    document.getElementById("loginScreen").style.display="none"
+    document.getElementById("loginBox").style.display="none"
   } else {
     alert("Неверный пароль")
   }
 }
 
+/* LOAD PRODUCTS */
 async function loadProducts(){
   const { data, error } = await supabase.from("products").select("*")
-  const container = document.getElementById("products")
-  container.innerHTML=""
-
   if(error){
     alert("Ошибка подключения к Supabase")
     return
   }
+
+  const container=document.getElementById("products")
+  container.innerHTML=""
 
   data.forEach(product=>{
     const card=document.createElement("div")
@@ -217,15 +203,22 @@ async function loadProducts(){
       <h4>${product.title}</h4>
       <p>${product.price} ₽</p>
     `
+
     container.appendChild(card)
   })
 }
 
+/* ADD PRODUCT */
 async function addProduct(){
   const title=document.getElementById("title").value
   const price=document.getElementById("price").value
   const description=document.getElementById("description").value
   const image=document.getElementById("image").value
+
+  if(!title || !price || !image){
+    alert("Заполните обязательные поля")
+    return
+  }
 
   const { error } = await supabase.from("products").insert([
     { title, price, description, image }
@@ -239,6 +232,7 @@ async function addProduct(){
   loadProducts()
 }
 
+/* DELETE */
 async function deleteProduct(id){
   const { error } = await supabase.from("products").delete().eq("id", id)
   if(error){
@@ -249,6 +243,7 @@ async function deleteProduct(id){
   loadProducts()
 }
 
+/* THEME */
 function toggleTheme(){
   document.body.classList.toggle("light")
 }
