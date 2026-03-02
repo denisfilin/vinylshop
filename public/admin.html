@@ -8,22 +8,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="icon" href="/logo.png">
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{
   --bg:#000;
-  --glass:rgba(0,0,0,0.6);
   --text:#fff;
+  --glass:rgba(0,0,0,0.6);
+}
+
+body.light{
+  --bg:#f5f5f5;
+  --text:#000;
+  --glass:rgba(255,255,255,0.6);
 }
 
 body{
   margin:0;
   font-family:'Inter',sans-serif;
-  background:#000;
+  background:var(--bg);
   color:var(--text);
-  overflow-x:hidden;
+  transition:.3s;
 }
 
-/* 🔥 Кирпичная стена */
 .bg{
   position:fixed;
   inset:0;
@@ -37,8 +44,8 @@ header{
   backdrop-filter:blur(20px);
   background:var(--glass);
   display:flex;
+  justify-content:space-between;
   align-items:center;
-  gap:20px;
 }
 
 .logo{
@@ -48,17 +55,12 @@ header{
   object-fit:cover;
 }
 
-h1{
-  margin:0;
-  font-size:22px;
-}
-
 .container{
   padding:40px 8%;
 }
 
 .glass{
-  background:rgba(255,255,255,0.07);
+  background:var(--glass);
   backdrop-filter:blur(20px);
   border-radius:25px;
   padding:30px;
@@ -81,11 +83,6 @@ button{
   font-weight:600;
 }
 
-.add-btn{
-  background:#fff;
-  color:#000;
-}
-
 .products{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -93,7 +90,7 @@ button{
 }
 
 .card{
-  background:rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.1);
   padding:20px;
   border-radius:20px;
   position:relative;
@@ -117,105 +114,146 @@ button{
   justify-content:center;
   align-items:center;
   cursor:pointer;
-  font-weight:bold;
+}
+
+.theme-toggle{
+  cursor:pointer;
+  font-size:18px;
+}
+
+.login-screen{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.login-box{
+  background:#111;
+  padding:40px;
+  border-radius:20px;
+  width:300px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- 🔐 LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h3 style="color:white">Admin Login</h3>
+    <input type="password" id="adminPassword" placeholder="Пароль">
+    <button onclick="checkPassword()">Войти</button>
+  </div>
+</div>
+
 <div class="bg"></div>
 
 <header>
-  <img src="/logo.png" class="logo">
-  <h1>Админ панель</h1>
+  <div style="display:flex;align-items:center;gap:15px">
+    <img src="/logo.png" class="logo">
+    <h2>Админка</h2>
+  </div>
+  <div class="theme-toggle" onclick="toggleTheme()">🌗</div>
 </header>
 
 <div class="container">
 
   <div class="glass">
-    <h2>Добавить товар</h2>
-
+    <h3>Добавить товар</h3>
     <input type="text" id="title" placeholder="Название">
     <input type="number" id="price" placeholder="Цена">
     <textarea id="description" placeholder="Описание"></textarea>
     <input type="text" id="image" placeholder="URL изображения">
-
-    <button class="add-btn" onclick="addProduct()">Добавить</button>
+    <button onclick="addProduct()">Добавить</button>
   </div>
 
   <div class="glass">
-    <h2>Список товаров</h2>
+    <h3>Товары</h3>
     <div class="products" id="products"></div>
   </div>
 
 </div>
 
 <script>
+// 🔥 ВСТАВЬ СВОИ ДАННЫЕ
+const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
+const SUPABASE_KEY = "sb_publishable_LaKsiiHyowziPgGTl5CdWA_beMfguyx"
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+const ADMIN_PASSWORD = "Df221188" // можно поменять
+
+function checkPassword(){
+  const value = document.getElementById("adminPassword").value
+  if(value === ADMIN_PASSWORD){
+    document.getElementById("loginScreen").style.display="none"
+  } else {
+    alert("Неверный пароль")
+  }
+}
+
 async function loadProducts(){
-  const res = await fetch('/api/products');
-  const data = await res.json();
-  const container = document.getElementById("products");
-  container.innerHTML="";
+  const { data, error } = await supabase.from("products").select("*")
+  const container = document.getElementById("products")
+  container.innerHTML=""
+
+  if(error){
+    alert("Ошибка подключения к Supabase")
+    return
+  }
 
   data.forEach(product=>{
-    const card=document.createElement("div");
-    card.className="card";
+    const card=document.createElement("div")
+    card.className="card"
 
     card.innerHTML=`
       <div class="delete" onclick="deleteProduct('${product.id}')">×</div>
       <img src="${product.image}">
-      <h3>${product.title}</h3>
+      <h4>${product.title}</h4>
       <p>${product.price} ₽</p>
-      <small>${product.description || ""}</small>
-    `;
-
-    container.appendChild(card);
-  });
+    `
+    container.appendChild(card)
+  })
 }
 
 async function addProduct(){
-  const title=document.getElementById("title").value;
-  const price=document.getElementById("price").value;
-  const description=document.getElementById("description").value;
-  const image=document.getElementById("image").value;
+  const title=document.getElementById("title").value
+  const price=document.getElementById("price").value
+  const description=document.getElementById("description").value
+  const image=document.getElementById("image").value
 
-  if(!title || !price || !image){
-    alert("Заполните обязательные поля");
-    return;
+  const { error } = await supabase.from("products").insert([
+    { title, price, description, image }
+  ])
+
+  if(error){
+    alert("Ошибка добавления")
+    return
   }
 
-  await fetch('/api/products',{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      id:Date.now().toString(),
-      title,
-      price,
-      description,
-      image
-    })
-  });
-
-  document.getElementById("title").value="";
-  document.getElementById("price").value="";
-  document.getElementById("description").value="";
-  document.getElementById("image").value="";
-
-  loadProducts();
+  loadProducts()
 }
 
 async function deleteProduct(id){
-  await fetch('/api/products',{
-    method:"DELETE",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ id })
-  });
+  const { error } = await supabase.from("products").delete().eq("id", id)
+  if(error){
+    alert("Ошибка удаления")
+    return
+  }
 
-  loadProducts();
+  loadProducts()
 }
 
-loadProducts();
+function toggleTheme(){
+  document.body.classList.toggle("light")
+}
+
+loadProducts()
 </script>
 
 </body>
