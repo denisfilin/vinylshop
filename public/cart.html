@@ -6,64 +6,84 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
+<link rel="icon" type="image/svg+xml"
+href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<circle cx='50' cy='50' r='48' fill='black'/>
+<circle cx='50' cy='50' r='18' fill='red'/>
+<circle cx='50' cy='50' r='5' fill='white'/>
+</svg>">
+
 <style>
 body{
   margin:0;
+  font-family:'Inter',sans-serif;
   background:#000;
   color:#fff;
-  font-family:'Inter',sans-serif;
+}
+
+.top-bg{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:url('/brick-wall-background.avif') center/cover no-repeat;
+  filter:brightness(0.5);
+  z-index:-1;
 }
 
 .container{
   max-width:900px;
-  margin:100px auto;
+  margin:120px auto;
   padding:20px;
 }
 
 .item{
-  background:rgba(255,255,255,0.06);
-  padding:20px;
-  border-radius:20px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  padding:25px;
+  border-radius:25px;
   margin-bottom:20px;
 }
 
-.total{
-  font-size:22px;
-  margin-top:30px;
-}
 button{
   padding:8px 14px;
   border:none;
   border-radius:20px;
   cursor:pointer;
 }
+
+.total{
+  font-size:22px;
+  margin-top:30px;
+}
 </style>
 </head>
 
 <body>
 
+<div class="top-bg"></div>
+
 <div class="container">
   <h1>Ваша корзина</h1>
   <div id="cartItems"></div>
   <div class="total" id="totalPrice"></div>
-  <button onclick="goBack()">← Вернуться</button>
+  <button onclick="window.location.href='index.html'">← Назад</button>
 </div>
 
 <script>
 let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
 
 function renderCart(){
-  const container = document.getElementById("cartItems");
+  let total=0;
+  const container=document.getElementById("cartItems");
   container.innerHTML="";
 
-  let total = 0;
-
   cart.forEach((item,index)=>{
-    total += Number(item.price||0);
+    total+=Number(item.price);
 
-    container.innerHTML += `
+    container.innerHTML+=`
       <div class="item">
-        <h3>${item.title || item.name}</h3>
+        <h3>${item.title}</h3>
         <p>${item.description || ""}</p>
         <p>${item.price} ₽</p>
         <button onclick="removeItem(${index})">Удалить</button>
@@ -71,17 +91,13 @@ function renderCart(){
     `;
   });
 
-  document.getElementById("totalPrice").innerText = "Итого: " + total + " ₽";
+  document.getElementById("totalPrice").innerText="Итого: "+total+" ₽";
 }
 
-function removeItem(index){
-  cart.splice(index,1);
-  localStorage.setItem("vinylCart", JSON.stringify(cart));
+function removeItem(i){
+  cart.splice(i,1);
+  localStorage.setItem("vinylCart",JSON.stringify(cart));
   renderCart();
-}
-
-function goBack(){
-  window.location.href="index.html";
 }
 
 renderCart();
