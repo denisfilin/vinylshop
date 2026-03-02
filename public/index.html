@@ -7,70 +7,105 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
+<!-- 🔥 НОРМАЛЬНЫЙ FAVICON -->
+<link rel="icon" type="image/png" href="/logo.png">
+
 <style>
 :root{
   --bg:#000;
   --text:#fff;
-  --card:rgba(255,255,255,0.06);
+  --glass:rgba(0,0,0,0.6);
 }
 
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
   font-family:'Inter',sans-serif;
+  color:var(--text);
+  background:#000;
   overflow-x:hidden;
+}
+
+/* 🔥 КИРПИЧНАЯ СТЕНА */
+.top-bg{
+  position:fixed;
+  inset:0;
+  background:url('/brick-wall-background.avif') center/cover no-repeat;
+  filter:brightness(0.5);
+  z-index:-1;
 }
 
 /* HEADER */
 header{
   position:fixed;
   top:0;
-  left:0;
   width:100%;
+  padding:20px 40px;
+  backdrop-filter:blur(20px);
+  background:var(--glass);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:20px 40px;
-  backdrop-filter:blur(25px);
-  background:rgba(0,0,0,0.6);
   z-index:100;
 }
 
 .logo{
-  height:70px;
-  width:70px;
+  height:80px;
+  width:80px;
   border-radius:50%;
   object-fit:cover;
 }
 
+/* HERO */
 .hero{
   height:100vh;
   display:flex;
+  flex-direction:column;
   justify-content:center;
   align-items:center;
-  flex-direction:column;
+  text-align:center;
 }
 
+/* 🔥 ПЛАСТИНКА */
+.vinyl{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  margin-top:40px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 40%),
+    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
+  box-shadow:
+    inset 0 0 40px rgba(255,255,255,0.2),
+    0 0 60px rgba(255,255,255,0.3);
+  animation:spin 8s linear infinite;
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+/* PRODUCTS */
 .products{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:50px;
   padding:120px 5%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:40px;
 }
 
 .card{
-  width:220px;
-  background:var(--card);
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
   padding:25px;
   border-radius:25px;
   text-align:center;
   position:relative;
-  transition:0.4s ease;
+  transition:.4s ease;
 }
 
 .card:hover{
   transform:translateY(-10px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.6);
 }
 
 .card img{
@@ -78,27 +113,33 @@ header{
   border-radius:18px;
 }
 
-/* 🔥 TOOLTIP DESCRIPTION */
+button{
+  margin-top:10px;
+  padding:8px 14px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+/* TOOLTIP */
 .tooltip{
   position:absolute;
   bottom:110%;
   left:50%;
   transform:translateX(-50%);
   background:#111;
-  padding:10px;
-  border-radius:10px;
-  width:200px;
-  font-size:12px;
+  padding:12px;
+  border-radius:12px;
+  width:220px;
+  font-size:13px;
   opacity:0;
-  pointer-events:none;
-  transition:0.3s ease;
+  transition:.3s ease;
 }
-
 .card:hover .tooltip{
   opacity:1;
 }
 
-/* CART BUTTON */
+/* 🔥 КНОПКА КОРЗИНЫ СО СЧЁТЧИКОМ */
 .cart{
   position:fixed;
   bottom:30px;
@@ -114,11 +155,35 @@ header{
   cursor:pointer;
   font-weight:bold;
   font-size:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+  transition:.3s ease;
+}
+
+.cart:hover{
+  transform:scale(1.1);
+}
+
+.cart-count{
+  position:absolute;
+  top:-8px;
+  right:-8px;
+  background:red;
+  color:#fff;
+  font-size:14px;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
+
+<div class="top-bg"></div>
 
 <header>
   <img src="/logo.png" class="logo">
@@ -126,55 +191,54 @@ header{
 
 <section class="hero">
   <h1>Музыка. Стиль. Атмосфера.</h1>
+  <div class="vinyl"></div>
 </section>
 
 <section class="products" id="products"></section>
 
-<div class="cart" onclick="openCart()">🛒</div>
+<div class="cart" onclick="window.location.href='cart.html'">
+  🛒
+  <div class="cart-count" id="cartCount">0</div>
+</div>
 
 <script>
 let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
+updateCartCount();
 
 async function loadProducts(){
   try{
     const res = await fetch('/api/products');
-    let data = await res.json();
-
+    const data = await res.json();
     const container = document.getElementById('products');
     container.innerHTML="";
 
     data.forEach(product=>{
-      const name = product.title || product.name || "Vinyl";
-      const price = product.price || 0;
-      const image = product.image || "";
-      const description = product.description || "Описание отсутствует";
-
-      const card = document.createElement('div');
+      const card=document.createElement('div');
       card.className="card";
 
       card.innerHTML=`
-        <img src="${image}">
-        <h3>${name}</h3>
-        <p>${price} ₽</p>
-        <div class="tooltip">${description}</div>
+        <img src="${product.image}">
+        <h3>${product.title}</h3>
+        <p>${product.price} ₽</p>
+        <div class="tooltip">${product.description || ""}</div>
         <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
       `;
-
       container.appendChild(card);
     });
 
   }catch(e){
-    console.log("API not found");
+    console.log("API error");
   }
 }
 
 function addToCart(product){
   cart.push(product);
-  localStorage.setItem("vinylCart", JSON.stringify(cart));
+  localStorage.setItem("vinylCart",JSON.stringify(cart));
+  updateCartCount();
 }
 
-function openCart(){
-  window.location.href="cart.html";
+function updateCartCount(){
+  document.getElementById("cartCount").innerText = cart.length;
 }
 
 loadProducts();
