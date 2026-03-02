@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Корзина — Vinyl Shop</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:'Inter',sans-serif;
+}
+
+.container{
+  max-width:900px;
+  margin:100px auto;
+  padding:20px;
+}
+
+.item{
+  background:rgba(255,255,255,0.06);
+  padding:20px;
+  border-radius:20px;
+  margin-bottom:20px;
+}
+
+.total{
+  font-size:22px;
+  margin-top:30px;
+}
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Ваша корзина</h1>
+  <div id="cartItems"></div>
+  <div class="total" id="totalPrice"></div>
+  <button onclick="goBack()">← Вернуться</button>
+</div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
+
+function renderCart(){
+  const container = document.getElementById("cartItems");
+  container.innerHTML="";
+
+  let total = 0;
+
+  cart.forEach((item,index)=>{
+    total += Number(item.price||0);
+
+    container.innerHTML += `
+      <div class="item">
+        <h3>${item.title || item.name}</h3>
+        <p>${item.description || ""}</p>
+        <p>${item.price} ₽</p>
+        <button onclick="removeItem(${index})">Удалить</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("totalPrice").innerText = "Итого: " + total + " ₽";
+}
+
+function removeItem(index){
+  cart.splice(index,1);
+  localStorage.setItem("vinylCart", JSON.stringify(cart));
+  renderCart();
+}
+
+function goBack(){
+  window.location.href="index.html";
+}
+
+renderCart();
+</script>
+
+</body>
+</html>
