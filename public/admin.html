@@ -26,11 +26,9 @@ body{
   margin:0;
   font-family:'Inter',sans-serif;
   background:#000;
-  color:var(--text);
-  overflow-x:hidden;
+  color:#fff;
 }
 
-/* 🔥 Кирпичная стена */
 .bg{
   position:fixed;
   inset:0;
@@ -53,11 +51,6 @@ header{
   height:60px;
   border-radius:50%;
   object-fit:cover;
-}
-
-h1{
-  margin:0;
-  font-size:22px;
 }
 
 .container{
@@ -143,10 +136,10 @@ button{
   <div class="glass">
     <h2>Добавить товар</h2>
 
-    <input type="text" id="title" placeholder="Название">
-    <input type="number" id="price" placeholder="Цена">
+    <input id="title" placeholder="Название">
+    <input id="price" type="number" placeholder="Цена">
     <textarea id="description" placeholder="Описание"></textarea>
-    <input type="text" id="image" placeholder="URL изображения">
+    <input id="image" placeholder="URL изображения">
 
     <button class="add-btn" onclick="addProduct()">Добавить</button>
   </div>
@@ -159,18 +152,17 @@ button{
 </div>
 
 <script>
-/* 🔥 ВСТАВЬ СВОИ ДАННЫЕ ИЗ SUPABASE */
+
+/* 🔥 ВСТАВЬ СВОИ ДАННЫЕ */
 const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"
 const SUPABASE_KEY = "YOUR_PUBLIC_ANON_KEY"
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+/* СОЗДАЁМ КЛИЕНТ ОДИН РАЗ */
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-/* Загрузка товаров */
+/* ЗАГРУЗКА */
 async function loadProducts(){
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending:false })
+  const { data, error } = await client.from("products").select("*")
 
   if(error){
     console.error(error)
@@ -197,7 +189,7 @@ async function loadProducts(){
   })
 }
 
-/* Добавление */
+/* ДОБАВЛЕНИЕ */
 async function addProduct(){
   const title=document.getElementById("title").value
   const price=document.getElementById("price").value
@@ -209,7 +201,7 @@ async function addProduct(){
     return
   }
 
-  const { error } = await supabase
+  const { error } = await client
     .from("products")
     .insert([{ title, price, description, image }])
 
@@ -219,17 +211,12 @@ async function addProduct(){
     return
   }
 
-  document.getElementById("title").value=""
-  document.getElementById("price").value=""
-  document.getElementById("description").value=""
-  document.getElementById("image").value=""
-
   loadProducts()
 }
 
-/* Удаление */
+/* УДАЛЕНИЕ */
 async function deleteProduct(id){
-  const { error } = await supabase
+  const { error } = await client
     .from("products")
     .delete()
     .eq("id", id)
@@ -244,6 +231,7 @@ async function deleteProduct(id){
 }
 
 loadProducts()
+
 </script>
 
 </body>
