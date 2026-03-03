@@ -64,6 +64,16 @@ button{
   padding:25px;
   border-radius:25px;
 }
+  .logo-container{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.logo{
+  max-width:150px;
+  height:auto;
+  border-radius:15px;
+}
 
 .order-form input, .order-form select{
   display:block;
@@ -88,7 +98,11 @@ button{
 <body>
 
 <div class="top-bg"></div>
-
+<div class="container">
+  <!-- Логотип -->
+  <div class="logo-container">
+    <img src="/public/logo.png" alt="Логотип" class="logo">
+  </div>
 <div class="container">
   <h1>Ваша корзина</h1>
   <div id="cartItems"></div>
