@@ -1,0 +1,4 @@
+mkdir vinyl-shop-server
+cd vinyl-shop-server
+npm init -y
+npm install express nodemailer cors dotenv
