@@ -174,7 +174,7 @@ async function checkAuth(){
     return
   }
 
-  document.getElementById("loginScreen").style.display = "none"
+  document.getElementById("loginScreen")?.remove()
   loadProducts()
 }
 
