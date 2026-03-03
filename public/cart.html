@@ -56,6 +56,32 @@ button{
   font-size:22px;
   margin-top:30px;
 }
+
+.order-form{
+  margin-top:40px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  padding:25px;
+  border-radius:25px;
+}
+
+.order-form input, .order-form select{
+  display:block;
+  width:100%;
+  padding:10px;
+  margin:10px 0 20px 0;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+
+.order-form button{
+  width:100%;
+  font-size:18px;
+  background:#ff4c4c;
+  color:#fff;
+  font-weight:600;
+}
 </style>
 </head>
 
@@ -68,6 +94,20 @@ button{
   <div id="cartItems"></div>
   <div class="total" id="totalPrice"></div>
   <button onclick="window.location.href='index.html'">← Назад</button>
+
+  <!-- Форма оформления заказа -->
+  <div class="order-form">
+    <h2>Оформление заказа</h2>
+    <input type="text" id="fullName" placeholder="ФИО" required>
+    <input type="email" id="email" placeholder="E-mail" required>
+    <input type="tel" id="phone" placeholder="Телефон (+7 XXX XXX XXXX)" required pattern="^\+7\d{10}$">
+    <select id="delivery">
+      <option value="">Выберите доставку</option>
+      <option value="ozon">ОЗОН</option>
+      <option value="cdek">СДЭК</option>
+    </select>
+    <button onclick="createOrder()">Создать заказ</button>
+  </div>
 </div>
 
 <script>
@@ -101,6 +141,58 @@ function removeItem(i){
 }
 
 renderCart();
+
+// Функция создания заказа
+function createOrder(){
+  const fullName = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const delivery = document.getElementById("delivery").value;
+
+  // Проверка полей
+  if(!fullName){
+    alert("Пожалуйста, введите ФИО.");
+    return;
+  }
+
+  if(!email || !/^\S+@\S+\.\S+$/.test(email)){
+    alert("Введите корректный E-mail.");
+    return;
+  }
+
+  if(!phone || !/^\+7\d{10}$/.test(phone)){
+    alert("Введите корректный номер телефона в формате +7XXXXXXXXXX.");
+    return;
+  }
+
+  if(!delivery){
+    alert("Выберите способ доставки.");
+    return;
+  }
+
+  // Сбор данных заказа
+  const order = {
+    customer: { fullName, email, phone },
+    delivery,
+    items: cart,
+    total: cart.reduce((sum,i)=>sum+Number(i.price),0),
+    date: new Date().toISOString()
+  };
+
+  console.log("Новый заказ:", order);
+  alert("Заказ создан! Проверяйте консоль для данных заказа.");
+
+  // Очистка корзины
+  localStorage.removeItem("vinylCart");
+  cart = [];
+  renderCart();
+
+  // Сброс формы
+  document.getElementById("fullName").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("delivery").value = "";
+}
 </script>
 
 </body>
