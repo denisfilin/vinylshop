@@ -191,10 +191,15 @@ async function loadProducts(){
 
 /* ДОБАВЛЕНИЕ */
 async function addProduct(){
-  const title=document.getElementById("title").value
-  const price=document.getElementById("price").value
-  const description=document.getElementById("description").value
-  const image=document.getElementById("image").value
+  const titleInput = document.getElementById("title")
+  const priceInput = document.getElementById("price")
+  const descriptionInput = document.getElementById("description")
+  const imageInput = document.getElementById("image")
+
+  const title = titleInput.value.trim()
+  const price = priceInput.value.trim()
+  const description = descriptionInput.value.trim()
+  const image = imageInput.value.trim()
 
   if(!title || !price || !image){
     alert("Заполните обязательные поля")
@@ -210,6 +215,12 @@ async function addProduct(){
     alert("Ошибка добавления")
     return
   }
+
+  /* ✅ ОЧИЩАЕМ ПОЛЯ ТОЛЬКО ПОСЛЕ УСПЕШНОЙ ЗАПИСИ */
+  titleInput.value = ""
+  priceInput.value = ""
+  descriptionInput.value = ""
+  imageInput.value = ""
 
   loadProducts()
 }
