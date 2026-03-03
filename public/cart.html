@@ -7,6 +7,14 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
+<link rel="icon" type="image/svg+xml"
+href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<circle cx='50' cy='50' r='48' fill='black'/>
+<circle cx='50' cy='50' r='18' fill='red'/>
+<circle cx='50' cy='50' r='5' fill='white'/>
+</svg>">
+
 <style>
 body{
   margin:0;
@@ -23,7 +31,7 @@ body{
   z-index:-1;
 }
 
-/* HEADER */
+/* HEADER (как на главной) */
 header{
   position:fixed;
   top:0;
@@ -44,42 +52,22 @@ header{
   cursor:pointer;
 }
 
-/* CONTENT */
 .container{
   max-width:900px;
   margin:160px auto 120px auto;
   padding:20px;
 }
 
-/* CART ITEM */
 .item{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(20px);
   padding:25px;
   border-radius:25px;
   margin-bottom:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-}
-
-.item img{
-  width:90px;
-  height:90px;
-  object-fit:cover;
-  border-radius:15px;
-}
-
-.qty{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin:10px 0;
 }
 
 button{
-  padding:6px 14px;
+  padding:8px 14px;
   border:none;
   border-radius:20px;
   cursor:pointer;
@@ -90,32 +78,27 @@ button{
   margin-top:30px;
 }
 
-/* ORDER FORM */
 .order-form{
-  margin-top:50px;
+  margin-top:40px;
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(20px);
-  padding:30px;
+  padding:25px;
   border-radius:25px;
 }
 
-.order-form h2{
-  margin-top:0;
-}
-
-.order-form input,
+.order-form input, 
 .order-form select{
+  display:block;
   width:100%;
-  padding:12px;
+  padding:10px;
   margin:10px 0 20px 0;
+  border-radius:10px;
   border:none;
-  border-radius:12px;
   font-size:16px;
 }
 
 .order-form button{
   width:100%;
-  padding:14px;
   font-size:18px;
   background:#ff4c4c;
   color:#fff;
@@ -128,30 +111,28 @@ button{
 
 <div class="top-bg"></div>
 
+<!-- HEADER С ЛОГОТИПОМ -->
 <header>
   <img src="/logo.png" class="logo" onclick="window.location.href='index.html'">
 </header>
 
 <div class="container">
   <h1>Ваша корзина</h1>
-
   <div id="cartItems"></div>
   <div class="total" id="totalPrice"></div>
+  <button onclick="window.location.href='index.html'">← Назад</button>
 
-  <!-- ORDER BLOCK -->
+  <!-- Форма оформления заказа -->
   <div class="order-form">
     <h2>Оформление заказа</h2>
-
-    <input type="text" id="fullName" placeholder="ФИО">
-    <input type="email" id="email" placeholder="E-mail">
-    <input type="tel" id="phone" placeholder="+7XXXXXXXXXX">
-    
+    <input type="text" id="fullName" placeholder="ФИО" required>
+    <input type="email" id="email" placeholder="E-mail" required>
+    <input type="tel" id="phone" placeholder="Телефон (+7XXXXXXXXXX)" required pattern="^\+7\d{10}$">
     <select id="delivery">
       <option value="">Выберите доставку</option>
       <option value="ozon">ОЗОН</option>
       <option value="cdek">СДЭК</option>
     </select>
-
     <button onclick="createOrder()">Создать заказ</button>
   </div>
 </div>
@@ -160,46 +141,24 @@ button{
 let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
 
 function renderCart(){
-  let total = 0;
-  const container = document.getElementById("cartItems");
-  container.innerHTML = "";
+  let total=0;
+  const container=document.getElementById("cartItems");
+  container.innerHTML="";
 
   cart.forEach((item,index)=>{
-    const qty = item.quantity || 1;
-    const sum = item.price * qty;
-    total += sum;
+    total+=Number(item.price);
 
-    container.innerHTML += `
+    container.innerHTML+=`
       <div class="item">
-        <div>
-          <h3>${item.title}</h3>
-          <p>${item.price} ₽</p>
-
-          <div class="qty">
-            <button onclick="changeQuantity(${index},-1)">−</button>
-            <strong>${qty}</strong>
-            <button onclick="changeQuantity(${index},1)">+</button>
-          </div>
-
-          <p>Сумма: ${sum} ₽</p>
-          <button onclick="removeItem(${index})">Удалить</button>
-        </div>
-
-        <img src="${item.image}" alt="${item.title}">
+        <h3>${item.title}</h3>
+        <p>${item.description || ""}</p>
+        <p>${item.price} ₽</p>
+        <button onclick="removeItem(${index})">Удалить</button>
       </div>
     `;
   });
 
-  document.getElementById("totalPrice").innerText = "Итого: " + total + " ₽";
-}
-
-function changeQuantity(index,delta){
-  cart[index].quantity += delta;
-  if(cart[index].quantity <= 0){
-    cart.splice(index,1);
-  }
-  localStorage.setItem("vinylCart",JSON.stringify(cart));
-  renderCart();
+  document.getElementById("totalPrice").innerText="Итого: "+total+" ₽";
 }
 
 function removeItem(i){
@@ -208,29 +167,31 @@ function removeItem(i){
   renderCart();
 }
 
+renderCart();
+
 function createOrder(){
-  const fullName = fullNameInput.value.trim();
-  const email = emailInput.value.trim();
-  const phone = phoneInput.value.trim();
-  const delivery = deliverySelect.value;
+  const fullName = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const delivery = document.getElementById("delivery").value;
 
   if(!fullName){
-    alert("Введите ФИО");
+    alert("Пожалуйста, введите ФИО.");
     return;
   }
 
-  if(!/^\S+@\S+\.\S+$/.test(email)){
-    alert("Введите корректный e-mail");
+  if(!email || !/^\S+@\S+\.\S+$/.test(email)){
+    alert("Введите корректный E-mail.");
     return;
   }
 
-  if(!/^\+7\d{10}$/.test(phone)){
-    alert("Телефон должен быть в формате +7XXXXXXXXXX");
+  if(!phone || !/^\+7\d{10}$/.test(phone)){
+    alert("Введите корректный номер телефона в формате +7XXXXXXXXXX.");
     return;
   }
 
   if(!delivery){
-    alert("Выберите способ доставки");
+    alert("Выберите способ доставки.");
     return;
   }
 
@@ -238,25 +199,22 @@ function createOrder(){
     customer: { fullName, email, phone },
     delivery,
     items: cart,
-    total: cart.reduce((s,i)=>s+i.price*(i.quantity||1),0),
+    total: cart.reduce((sum,i)=>sum+Number(i.price),0),
     date: new Date().toISOString()
   };
 
-  console.log("ORDER:", order);
+  console.log("Новый заказ:", order);
   alert("Заказ создан! Проверьте консоль.");
 
   localStorage.removeItem("vinylCart");
   cart = [];
   renderCart();
+
+  document.getElementById("fullName").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("delivery").value = "";
 }
-
-/* shortcuts */
-const fullNameInput = document.getElementById("fullName");
-const emailInput = document.getElementById("email");
-const phoneInput = document.getElementById("phone");
-const deliverySelect = document.getElementById("delivery");
-
-renderCart();
 </script>
 
 </body>
