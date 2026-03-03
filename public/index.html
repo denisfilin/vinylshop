@@ -7,7 +7,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-<!-- 🔥 НОРМАЛЬНЫЙ FAVICON -->
 <link rel="icon" type="image/svg+xml"
 href="data:image/svg+xml,
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
@@ -18,20 +17,17 @@ href="data:image/svg+xml,
 
 <style>
 :root{
-  --bg:#000;
-  --text:#fff;
   --glass:rgba(0,0,0,0.6);
 }
 
 body{
   margin:0;
   font-family:'Inter',sans-serif;
-  color:var(--text);
   background:#000;
+  color:#fff;
   overflow-x:hidden;
 }
 
-/* 🔥 КИРПИЧНАЯ СТЕНА */
 .top-bg{
   position:fixed;
   inset:0;
@@ -40,7 +36,6 @@ body{
   z-index:-1;
 }
 
-/* HEADER */
 header{
   position:fixed;
   top:0;
@@ -49,7 +44,6 @@ header{
   backdrop-filter:blur(20px);
   background:var(--glass);
   display:flex;
-  justify-content:space-between;
   align-items:center;
   z-index:100;
 }
@@ -61,39 +55,8 @@ header{
   object-fit:cover;
 }
 
-/* HERO */
-.hero{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-}
-
-/* 🔥 ПЛАСТИНКА */
-.vinyl{
-  width:220px;
-  height:220px;
-  border-radius:50%;
-  margin-top:40px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 40%),
-    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
-  box-shadow:
-    inset 0 0 40px rgba(255,255,255,0.2),
-    0 0 60px rgba(255,255,255,0.3);
-  animation:spin 8s linear infinite;
-}
-
-@keyframes spin{
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
-}
-
-/* PRODUCTS */
 .products{
-  padding:120px 5%;
+  padding:160px 5%;
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   gap:40px;
@@ -105,7 +68,6 @@ header{
   padding:25px;
   border-radius:25px;
   text-align:center;
-  position:relative;
   transition:.4s ease;
 }
 
@@ -127,25 +89,6 @@ button{
   cursor:pointer;
 }
 
-/* TOOLTIP */
-.tooltip{
-  position:absolute;
-  bottom:110%;
-  left:50%;
-  transform:translateX(-50%);
-  background:#111;
-  padding:12px;
-  border-radius:12px;
-  width:220px;
-  font-size:13px;
-  opacity:0;
-  transition:.3s ease;
-}
-.card:hover .tooltip{
-  opacity:1;
-}
-
-/* 🔥 КНОПКА КОРЗИНЫ СО СЧЁТЧИКОМ */
 .cart{
   position:fixed;
   bottom:30px;
@@ -195,11 +138,6 @@ button{
   <img src="/logo.png" class="logo">
 </header>
 
-<section class="hero">
-  <h1>Music. Style. Atmosphere.</h1>
-  <div class="vinyl"></div>
-</section>
-
 <section class="products" id="products"></section>
 
 <div class="cart" onclick="window.location.href='cart.html'">
@@ -212,39 +150,42 @@ let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
 updateCartCount();
 
 async function loadProducts(){
-  try{
-    const res = await fetch('/api/products');
-    const data = await res.json();
-    const container = document.getElementById('products');
-    container.innerHTML="";
+  const res = await fetch('/api/products');
+  const data = await res.json();
+  const container = document.getElementById('products');
+  container.innerHTML="";
 
-    data.forEach(product=>{
-      const card=document.createElement('div');
-      card.className="card";
+  data.forEach(product=>{
+    const card=document.createElement('div');
+    card.className="card";
 
-      card.innerHTML=`
-        <img src="${product.image}">
-        <h3>${product.title}</h3>
-        <p>${product.price} ₽</p>
-        <div class="tooltip">${product.description || ""}</div>
-        <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
-      `;
-      container.appendChild(card);
-    });
-
-  }catch(e){
-    console.log("API error");
-  }
+    card.innerHTML=`
+      <img src="${product.image}">
+      <h3>${product.title}</h3>
+      <p>${product.price} ₽</p>
+      <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
+    `;
+    container.appendChild(card);
+  });
 }
 
 function addToCart(product){
-  cart.push(product);
-  localStorage.setItem("vinylCart",JSON.stringify(cart));
+  const existing = cart.find(item => item.id === product.id);
+
+  if(existing){
+    existing.quantity += 1;
+  } else {
+    product.quantity = 1;
+    cart.push(product);
+  }
+
+  localStorage.setItem("vinylCart", JSON.stringify(cart));
   updateCartCount();
 }
 
 function updateCartCount(){
-  document.getElementById("cartCount").innerText = cart.length;
+  const total = cart.reduce((sum,item)=>sum+(item.quantity||1),0);
+  document.getElementById("cartCount").innerText = total;
 }
 
 loadProducts();
