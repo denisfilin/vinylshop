@@ -31,7 +31,6 @@ body{
   z-index:-1;
 }
 
-/* HEADER (как на главной) */
 header{
   position:fixed;
   top:0;
@@ -58,12 +57,28 @@ header{
   padding:20px;
 }
 
+/* 🔥 Товар в корзине */
 .item{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(20px);
   padding:25px;
   border-radius:25px;
   margin-bottom:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.item-info{
+  flex:1;
+}
+
+.item img{
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:15px;
 }
 
 button{
@@ -111,7 +126,6 @@ button{
 
 <div class="top-bg"></div>
 
-<!-- HEADER С ЛОГОТИПОМ -->
 <header>
   <img src="/logo.png" class="logo" onclick="window.location.href='index.html'">
 </header>
@@ -122,7 +136,6 @@ button{
   <div class="total" id="totalPrice"></div>
   <button onclick="window.location.href='index.html'">← Назад</button>
 
-  <!-- Форма оформления заказа -->
   <div class="order-form">
     <h2>Оформление заказа</h2>
     <input type="text" id="fullName" placeholder="ФИО" required>
@@ -150,10 +163,13 @@ function renderCart(){
 
     container.innerHTML+=`
       <div class="item">
-        <h3>${item.title}</h3>
-        <p>${item.description || ""}</p>
-        <p>${item.price} ₽</p>
-        <button onclick="removeItem(${index})">Удалить</button>
+        <div class="item-info">
+          <h3>${item.title}</h3>
+          <p>${item.description || ""}</p>
+          <p>${item.price} ₽</p>
+          <button onclick="removeItem(${index})">Удалить</button>
+        </div>
+        <img src="${item.image}" alt="${item.title}">
       </div>
     `;
   });
@@ -175,25 +191,10 @@ function createOrder(){
   const phone = document.getElementById("phone").value.trim();
   const delivery = document.getElementById("delivery").value;
 
-  if(!fullName){
-    alert("Пожалуйста, введите ФИО.");
-    return;
-  }
-
-  if(!email || !/^\S+@\S+\.\S+$/.test(email)){
-    alert("Введите корректный E-mail.");
-    return;
-  }
-
-  if(!phone || !/^\+7\d{10}$/.test(phone)){
-    alert("Введите корректный номер телефона в формате +7XXXXXXXXXX.");
-    return;
-  }
-
-  if(!delivery){
-    alert("Выберите способ доставки.");
-    return;
-  }
+  if(!fullName){ alert("Введите ФИО."); return; }
+  if(!email || !/^\S+@\S+\.\S+$/.test(email)){ alert("Введите корректный E-mail."); return; }
+  if(!phone || !/^\+7\d{10}$/.test(phone)){ alert("Введите телефон в формате +7XXXXXXXXXX."); return; }
+  if(!delivery){ alert("Выберите способ доставки."); return; }
 
   const order = {
     customer: { fullName, email, phone },
@@ -204,16 +205,11 @@ function createOrder(){
   };
 
   console.log("Новый заказ:", order);
-  alert("Заказ создан! Проверьте консоль.");
+  alert("Заказ создан!");
 
   localStorage.removeItem("vinylCart");
   cart = [];
   renderCart();
-
-  document.getElementById("fullName").value = "";
-  document.getElementById("email").value = "";
-  document.getElementById("phone").value = "";
-  document.getElementById("delivery").value = "";
 }
 </script>
 
