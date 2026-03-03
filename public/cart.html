@@ -31,7 +31,7 @@ body{
   z-index:-1;
 }
 
-/* HEADER (как на главной) */
+/* HEADER */
 header{
   position:fixed;
   top:0;
@@ -64,6 +64,21 @@ header{
   padding:25px;
   border-radius:25px;
   margin-bottom:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.item-info{
+  flex:1;
+}
+
+.item img{
+  width:100px;
+  height:100px;
+  object-fit:cover;
+  border-radius:15px;
 }
 
 button{
@@ -111,7 +126,6 @@ button{
 
 <div class="top-bg"></div>
 
-<!-- HEADER С ЛОГОТИПОМ -->
 <header>
   <img src="/logo.png" class="logo" onclick="window.location.href='index.html'">
 </header>
@@ -122,7 +136,6 @@ button{
   <div class="total" id="totalPrice"></div>
   <button onclick="window.location.href='index.html'">← Назад</button>
 
-  <!-- Форма оформления заказа -->
   <div class="order-form">
     <h2>Оформление заказа</h2>
     <input type="text" id="fullName" placeholder="ФИО" required>
@@ -150,10 +163,13 @@ function renderCart(){
 
     container.innerHTML+=`
       <div class="item">
-        <h3>${item.title}</h3>
-        <p>${item.description || ""}</p>
-        <p>${item.price} ₽</p>
-        <button onclick="removeItem(${index})">Удалить</button>
+        <div class="item-info">
+          <h3>${item.title}</h3>
+          <p>${item.description || ""}</p>
+          <p>${item.price} ₽</p>
+          <button onclick="removeItem(${index})">Удалить</button>
+        </div>
+        <img src="${item.image}" alt="${item.title}">
       </div>
     `;
   });
@@ -204,7 +220,7 @@ function createOrder(){
   };
 
   console.log("Новый заказ:", order);
-  alert("Заказ создан! Проверьте консоль.");
+  alert("Заказ создан!");
 
   localStorage.removeItem("vinylCart");
   cart = [];
