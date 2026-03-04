@@ -1,35 +1,87 @@
-import { createClient } from "@supabase/supabase-js";
+// js/cart.js
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const serverUrl = "https://твоя-ссылка.vercel.app"; // <- твой Production URL
+const userId = "demo-user";
+let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
 
-export default async function handler(req, res) {
-  const { userId } = req.query;
+async function renderCart() {
+  try {
+    const res = await fetch(`${serverUrl}/api/cart/${userId}`);
+    const data = await res.json();
+    cart = data.items || [];
+    localStorage.setItem("vinylCart", JSON.stringify(cart));
 
-  if (req.method === "GET") {
-    // Получить корзину
-    const { data, error } = await supabase.from("carts").select("*").eq("user_id", userId).single();
-    if (error) return res.status(400).json({ error: error.message });
-    return res.json(data || { user_id: userId, items: [] });
+    let total = 0;
+    const container = document.getElementById("cartItems");
+    container.innerHTML = "";
+
+    cart.forEach((item, index) => {
+      total += Number(item.price);
+      container.innerHTML += `
+        <div class="item">
+          <div class="item-info">
+            <h3>${item.title}</h3>
+            <p>${item.description || ""}</p>
+            <p>${item.price} ₽</p>
+            <button onclick="removeItem(${item.product_id})">Удалить</button>
+          </div>
+          <img src="${item.image}" alt="${item.title}">
+        </div>
+      `;
+    });
+
+    const totalEl = document.getElementById("totalPrice");
+    if (totalEl) totalEl.innerText = "Итого: " + total + " ₽";
+  } catch (err) {
+    console.error("Ошибка загрузки корзины:", err);
   }
-
-  if (req.method === "POST") {
-    const { action, product } = req.body;
-
-    // Получаем текущую корзину
-    const { data } = await supabase.from("carts").select("*").eq("user_id", userId).single();
-    let items = data?.items || [];
-
-    if (action === "add") {
-      items.push(product);
-    } else if (action === "remove") {
-      items = items.filter(i => i.product_id !== product.product_id);
-    }
-
-    const { data: updated, error } = await supabase.from("carts").upsert({ user_id: userId, items }).select();
-    if (error) return res.status(400).json({ error: error.message });
-
-    return res.json(updated[0]);
-  }
-
-  res.status(405).json({ error: "Method not allowed" });
 }
+
+async function removeItem(productId) {
+  try {
+    const res = await fetch(`${serverUrl}/api/cart/${userId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "remove", product: { product_id: productId } })
+    });
+    const updatedCart = await res.json();
+    cart = updatedCart.items;
+    localStorage.setItem("vinylCart", JSON.stringify(cart));
+    renderCart();
+  } catch (err) {
+    console.error("Ошибка удаления товара:", err);
+  }
+}
+
+async function createOrder() {
+  const fullName = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const delivery = document.getElementById("delivery").value;
+
+  if (!fullName) return alert("Введите ФИО.");
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) return alert("Введите корректный E-mail.");
+  if (!phone || !/^\+7\d{10}$/.test(phone)) return alert("Введите телефон в формате +7XXXXXXXXXX.");
+  if (!delivery) return alert("Выберите способ доставки.");
+
+  try {
+    const res = await fetch(`${serverUrl}/api/order/${userId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName, email, phone, delivery })
+    });
+    const result = await res.json();
+    alert(result.message || "Заказ создан!");
+
+    // очистка корзины
+    cart = [];
+    localStorage.removeItem("vinylCart");
+    renderCart();
+  } catch (err) {
+    console.error("Ошибка создания заказа:", err);
+    alert("Ошибка при создании заказа.");
+  }
+}
+
+// запуск
+renderCart();
