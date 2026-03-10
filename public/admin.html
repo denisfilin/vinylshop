@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin • Vinyl Shop</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="icon" href="/logo.png">
+<link rel="icon" type="image/svg+xml"
+href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<circle cx='50' cy='50' r='48' fill='black'/>
+<circle cx='50' cy='50' r='18' fill='red'/>
+<circle cx='50' cy='50' r='5' fill='white'/>
+</svg>">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
@@ -152,15 +159,31 @@ button{
 </div>
 
 <script>
+/* 🔥 ВСТАВЬ СВОИ ДАННЫЕ ИЗ SUPABASE */
+const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
+const SUPABASE_KEY = "sb_secret_JdSP3B4kQg4oIzjc_pkupg_lv0DZlir"
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+/* Загрузка товаров */
 async function loadProducts(){
-  const res = await fetch('/api/products');
-  const data = await res.json();
-  const container = document.getElementById("products");
-  container.innerHTML="";
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending:false })
+
+  if(error){
+    console.error(error)
+    alert("Ошибка подключения к базе")
+    return
+  }
+
+  const container = document.getElementById("products")
+  container.innerHTML=""
 
   data.forEach(product=>{
-    const card=document.createElement("div");
-    card.className="card";
+    const card=document.createElement("div")
+    card.className="card"
 
     card.innerHTML=`
       <div class="delete" onclick="deleteProduct('${product.id}')">×</div>
@@ -168,54 +191,59 @@ async function loadProducts(){
       <h3>${product.title}</h3>
       <p>${product.price} ₽</p>
       <small>${product.description || ""}</small>
-    `;
+    `
 
-    container.appendChild(card);
-  });
+    container.appendChild(card)
+  })
 }
 
+/* Добавление */
 async function addProduct(){
-  const title=document.getElementById("title").value;
-  const price=document.getElementById("price").value;
-  const description=document.getElementById("description").value;
-  const image=document.getElementById("image").value;
+  const title=document.getElementById("title").value
+  const price=document.getElementById("price").value
+  const description=document.getElementById("description").value
+  const image=document.getElementById("image").value
 
   if(!title || !price || !image){
-    alert("Заполните обязательные поля");
-    return;
+    alert("Заполните обязательные поля")
+    return
   }
 
-  await fetch('/api/products',{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      id:Date.now().toString(),
-      title,
-      price,
-      description,
-      image
-    })
-  });
+  const { error } = await supabase
+    .from("products")
+    .insert([{ title, price, description, image }])
 
-  document.getElementById("title").value="";
-  document.getElementById("price").value="";
-  document.getElementById("description").value="";
-  document.getElementById("image").value="";
+  if(error){
+    console.error(error)
+    alert("Ошибка добавления")
+    return
+  }
 
-  loadProducts();
+  document.getElementById("title").value=""
+  document.getElementById("price").value=""
+  document.getElementById("description").value=""
+  document.getElementById("image").value=""
+
+  loadProducts()
 }
 
+/* Удаление */
 async function deleteProduct(id){
-  await fetch('/api/products',{
-    method:"DELETE",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ id })
-  });
+  const { error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", id)
 
-  loadProducts();
+  if(error){
+    console.error(error)
+    alert("Ошибка удаления")
+    return
+  }
+
+  loadProducts()
 }
 
-loadProducts();
+loadProducts()
 </script>
 
 </body>
