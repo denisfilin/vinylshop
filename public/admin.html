@@ -6,11 +6,53 @@
 <title>Admin • Vinyl Shop</title>
 
 <link rel="icon" type="image/svg+xml"
-href="data:image/svg+xml,
+href="data:image/svg+xml;utf8,
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-<circle cx='50' cy='50' r='48' fill='black'/>
-<circle cx='50' cy='50' r='18' fill='red'/>
+
+<defs>
+
+<clipPath id='label'>
+<circle cx='50' cy='50' r='18'/>
+</clipPath>
+
+<radialGradient id='vinyl'>
+<stop offset='0%' stop-color='%23111111'/>
+<stop offset='60%' stop-color='%23000000'/>
+<stop offset='100%' stop-color='%23000000'/>
+</radialGradient>
+
+</defs>
+
+<g>
+
+<animateTransform
+attributeName='transform'
+type='rotate'
+from='0 50 50'
+to='360 50 50'
+dur='6s'
+repeatCount='indefinite'/>
+
+<circle cx='50' cy='50' r='48' fill='url(%23vinyl)'/>
+
+<circle cx='50' cy='50' r='44' fill='none' stroke='%23161616' stroke-width='0.6'/>
+<circle cx='50' cy='50' r='40' fill='none' stroke='%23161616' stroke-width='0.6'/>
+<circle cx='50' cy='50' r='36' fill='none' stroke='%23161616' stroke-width='0.6'/>
+<circle cx='50' cy='50' r='32' fill='none' stroke='%23161616' stroke-width='0.6'/>
+<circle cx='50' cy='50' r='28' fill='none' stroke='%23161616' stroke-width='0.6'/>
+<circle cx='50' cy='50' r='24' fill='none' stroke='%23161616' stroke-width='0.6'/>
+
+<image
+href='/logo.png'
+x='32'
+y='32'
+width='36'
+height='36'
+clip-path='url(%23label)'/>
+
 <circle cx='50' cy='50' r='5' fill='white'/>
+
+</g>
 </svg>">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -133,169 +175,176 @@ button{
 
 <div class="container">
 
-  <div class="glass">
-    <h2>Добавить товар</h2>
+<div class="glass">
+<h2>Добавить товар</h2>
 
-    <input id="title" placeholder="Название">
-    <input id="price" type="number" placeholder="Цена">
-    <textarea id="description" placeholder="Описание"></textarea>
-    <input id="image" placeholder="URL изображения">
+<input id="title" placeholder="Название">
+<input id="price" type="number" placeholder="Цена">
+<textarea id="description" placeholder="Описание"></textarea>
+<input id="image" placeholder="URL изображения">
 
-    <button class="add-btn" onclick="addProduct()">Добавить</button>
-  </div>
+<button class="add-btn" onclick="addProduct()">Добавить</button>
+</div>
 
-  <div class="glass">
-    <h2>Список товаров</h2>
-    <div class="products" id="products"></div>
-  </div>
+<div class="glass">
+<h2>Список товаров</h2>
+<div class="products" id="products"></div>
+</div>
 
 </div>
 
 <script>
+
 const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
 const SUPABASE_KEY = "sb_publishable_LaKsiiHyowziPgGTl5CdWA_beMfguyx"
 const ADMIN_EMAIL = "denis_filin@bk.ru"
 
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-/* 🔐 ПРОВЕРКА АВТОРИЗАЦИИ */
 async function checkAuth(){
-  const { data: { session } } = await client.auth.getSession()
+const { data: { session } } = await client.auth.getSession()
 
-  if(!session){
-    showLogin()
-    return
-  }
-
-  if(session.user.email !== ADMIN_EMAIL){
-    alert("Нет доступа")
-    await client.auth.signOut()
-    showLogin()
-    return
-  }
-
-  document.getElementById("loginScreen")?.remove()
-  loadProducts()
+if(!session){
+showLogin()
+return
 }
 
-/* 🔐 LOGIN */
+if(session.user.email !== ADMIN_EMAIL){
+alert("Нет доступа")
+await client.auth.signOut()
+showLogin()
+return
+}
+
+document.getElementById("loginScreen")?.remove()
+loadProducts()
+}
+
 async function login(){
-  const email = document.getElementById("loginEmail").value
-  const password = document.getElementById("loginPassword").value
 
-  const { error } = await client.auth.signInWithPassword({
-    email,
-    password
-  })
+const email = document.getElementById("loginEmail").value
+const password = document.getElementById("loginPassword").value
 
-  if(error){
-    document.getElementById("loginError").textContent = error.message
-    return
-  }
+const { error } = await client.auth.signInWithPassword({
+email,
+password
+})
 
-  checkAuth()
+if(error){
+document.getElementById("loginError").textContent = error.message
+return
 }
 
-/* 🔐 LOGOUT */
-async function logout(){
-  await client.auth.signOut()
-  location.reload()
-}
-
-/* 📦 ЗАГРУЗКА */
-async function loadProducts(){
-  const { data, error } = await client.from("products").select("*")
-
-  if(error){
-    alert("Ошибка подключения")
-    return
-  }
-
-  const container = document.getElementById("products")
-  container.innerHTML=""
-
-  data.forEach(product=>{
-    const card=document.createElement("div")
-    card.className="card"
-
-    card.innerHTML=`
-      <div class="delete" onclick="deleteProduct('${product.id}')">×</div>
-      <img src="${product.image}">
-      <h3>${product.title}</h3>
-      <p>${product.price} ₽</p>
-      <small>${product.description || ""}</small>
-    `
-    container.appendChild(card)
-  })
-}
-
-/* ➕ ДОБАВЛЕНИЕ */
-async function addProduct(){
-  const title=document.getElementById("title").value.trim()
-  const price=document.getElementById("price").value.trim()
-  const description=document.getElementById("description").value.trim()
-  const image=document.getElementById("image").value.trim()
-
-  if(!title || !price || !image){
-    alert("Заполните обязательные поля")
-    return
-  }
-
-  const { error } = await client
-    .from("products")
-    .insert([{ title, price, description, image }])
-
-  if(error){
-    alert("Нет прав")
-    return
-  }
-
-  document.getElementById("title").value=""
-  document.getElementById("price").value=""
-  document.getElementById("description").value=""
-  document.getElementById("image").value=""
-
-  loadProducts()
-}
-
-/* ❌ УДАЛЕНИЕ */
-async function deleteProduct(id){
-  const { error } = await client
-    .from("products")
-    .delete()
-    .eq("id", id)
-
-  if(error){
-    alert("Нет прав")
-    return
-  }
-
-  loadProducts()
-}
-
-/* 🔐 LOGIN SCREEN */
-function showLogin(){
-  document.body.innerHTML = `
-  <div style="
-  height:100vh;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  gap:15px;
-  ">
-    <h2 style="color:white;">Admin Login</h2>
-    <input id="loginEmail" placeholder="Email" style="padding:10px;border-radius:10px;border:none;">
-    <input id="loginPassword" type="password" placeholder="Password" style="padding:10px;border-radius:10px;border:none;">
-    <button onclick="login()" style="padding:10px 20px;border-radius:20px;border:none;">Войти</button>
-    <p id="loginError" style="color:red;"></p>
-  </div>
-  `
-}
-
-/* СТАРТ */
 checkAuth()
+
+}
+
+async function logout(){
+await client.auth.signOut()
+location.reload()
+}
+
+async function loadProducts(){
+
+const { data, error } = await client.from("products").select("*")
+
+if(error){
+alert("Ошибка подключения")
+return
+}
+
+const container = document.getElementById("products")
+container.innerHTML=""
+
+data.forEach(product=>{
+
+const card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<div class="delete" onclick="deleteProduct('${product.id}')">×</div>
+<img src="${product.image}">
+<h3>${product.title}</h3>
+<p>${product.price} ₽</p>
+<small>${product.description || ""}</small>
+`
+
+container.appendChild(card)
+
+})
+
+}
+
+async function addProduct(){
+
+const title=document.getElementById("title").value.trim()
+const price=document.getElementById("price").value.trim()
+const description=document.getElementById("description").value.trim()
+const image=document.getElementById("image").value.trim()
+
+if(!title || !price || !image){
+alert("Заполните обязательные поля")
+return
+}
+
+const { error } = await client
+.from("products")
+.insert([{ title, price, description, image }])
+
+if(error){
+alert("Нет прав")
+return
+}
+
+document.getElementById("title").value=""
+document.getElementById("price").value=""
+document.getElementById("description").value=""
+document.getElementById("image").value=""
+
+loadProducts()
+
+}
+
+async function deleteProduct(id){
+
+const { error } = await client
+.from("products")
+.delete()
+.eq("id", id)
+
+if(error){
+alert("Нет прав")
+return
+}
+
+loadProducts()
+
+}
+
+function showLogin(){
+
+document.body.innerHTML = `
+<div style="
+height:100vh;
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+gap:15px;
+">
+<h2 style="color:white;">Admin Login</h2>
+<input id="loginEmail" placeholder="Email" style="padding:10px;border-radius:10px;border:none;">
+<input id="loginPassword" type="password" placeholder="Password" style="padding:10px;border-radius:10px;border:none;">
+<button onclick="login()" style="padding:10px 20px;border-radius:20px;border:none;">Войти</button>
+<p id="loginError" style="color:red;"></p>
+</div>
+`
+
+}
+
+checkAuth()
+
 </script>
 </body>
 </html>
