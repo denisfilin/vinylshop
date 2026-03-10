@@ -6,7 +6,7 @@
 <title>Vinyl Shop</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="icon" type="image/svg+xml"
 href="data:image/svg+xml,
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
@@ -230,23 +230,37 @@ button{
 
 <script>
 
-let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
-updateCartCount();
+const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
+const SUPABASE_KEY = "sb_publishable_LaKsiiHyowziPgGTl5CdWA_beMfguyx"
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+let cart = JSON.parse(localStorage.getItem("vinylCart")) || []
+
+updateCartCount()
+
+/* Загрузка товаров из Supabase */
 
 async function loadProducts(){
 
 try{
 
-const res = await fetch('/api/products');
-const data = await res.json();
+const { data, error } = await supabaseClient
+.from("products")
+.select("*")
 
-const container = document.getElementById('products');
-container.innerHTML="";
+if(error){
+console.error("Supabase error:", error)
+return
+}
+
+const container = document.getElementById("products")
+container.innerHTML=""
 
 data.forEach(product=>{
 
-const card=document.createElement('div');
-card.className="card";
+const card=document.createElement("div")
+card.className="card"
 
 card.innerHTML=`
 <img src="${product.image}">
@@ -254,37 +268,43 @@ card.innerHTML=`
 <p>${product.price} ₽</p>
 <div class="tooltip">${product.description || ""}</div>
 <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
-`;
+`
 
-container.appendChild(card);
+container.appendChild(card)
 
-});
+})
 
 }catch(e){
-console.log("API error");
+
+console.log("Connection error", e)
+
 }
 
 }
+
+/* Корзина */
 
 function addToCart(product){
 
-cart.push(product);
+cart.push(product)
 
-localStorage.setItem("vinylCart",JSON.stringify(cart));
+localStorage.setItem("vinylCart",JSON.stringify(cart))
 
-updateCartCount();
+updateCartCount()
 
 }
 
 function updateCartCount(){
 
-document.getElementById("cartCount").innerText = cart.length;
+document.getElementById("cartCount").innerText = cart.length
 
 }
 
-loadProducts();
+loadProducts()
 
 </script>
+
+
 
 <script src="js/products.js" defer></script>
 
