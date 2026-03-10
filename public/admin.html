@@ -158,28 +158,29 @@ button{
 
 </div>
 
-<script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-/* ДАННЫЕ SUPABASE */
-const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
-const SUPABASE_KEY = "LaKsiiHyowziPgGTl5CdWA_beMfguyx"
 
-/* СОЗДАНИЕ КЛИЕНТА */
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+/* ПОДКЛЮЧЕНИЕ SUPABASE */
+const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
+const SUPABASE_KEY = "sb_publishable_LaKsiiHyowziPgGTl5CdWA_beMfguyx"
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
 /* ЗАГРУЗКА ТОВАРОВ */
+
 async function loadProducts(){
 
-const { data, error } = await supabaseClient
+const { data, error } = await db
 .from("products")
 .select("*")
-.order("id", { ascending:false })
+.order("id",{ascending:false})
 
 if(error){
-console.error("Supabase error:", error)
-alert("Нет связи с базой данных")
+console.error("Supabase error:",error)
+alert("Ошибка подключения к базе")
 return
 }
 
@@ -192,7 +193,7 @@ const card=document.createElement("div")
 card.className="card"
 
 card.innerHTML=`
-<div class="delete" onclick="deleteProduct('${product.id}')">×</div>
+<div class="delete" onclick="deleteProduct(${product.id})">×</div>
 <img src="${product.image}">
 <h3>${product.title}</h3>
 <p>${product.price} ₽</p>
@@ -205,54 +206,62 @@ container.appendChild(card)
 
 }
 
-/* ДОБАВЛЕНИЕ ТОВАРА */
+/* ДОБАВЛЕНИЕ */
+
 async function addProduct(){
 
-const title=document.getElementById("title").value.trim()
-const price=document.getElementById("price").value.trim()
-const description=document.getElementById("description").value.trim()
-const image=document.getElementById("image").value.trim()
+const titleInput=document.getElementById("title")
+const priceInput=document.getElementById("price")
+const descriptionInput=document.getElementById("description")
+const imageInput=document.getElementById("image")
+
+const title=titleInput.value.trim()
+const price=priceInput.value.trim()
+const description=descriptionInput.value.trim()
+const image=imageInput.value.trim()
 
 if(!title || !price || !image){
 alert("Заполните обязательные поля")
 return
 }
 
-const { error } = await supabaseClient
+const { error } = await db
 .from("products")
 .insert([{
-title,
-price,
-description,
-image
+title:title,
+price:price,
+description:description,
+image:image
 }])
 
 if(error){
-console.error("Insert error:", error)
+console.error(error)
 alert("Ошибка добавления")
 return
 }
 
 /* очистка полей */
-document.getElementById("title").value=""
-document.getElementById("price").value=""
-document.getElementById("description").value=""
-document.getElementById("image").value=""
+
+titleInput.value=""
+priceInput.value=""
+descriptionInput.value=""
+imageInput.value=""
 
 loadProducts()
 
 }
 
 /* УДАЛЕНИЕ */
+
 async function deleteProduct(id){
 
-const { error } = await supabaseClient
+const { error } = await db
 .from("products")
 .delete()
-.eq("id", id)
+.eq("id",id)
 
 if(error){
-console.error("Delete error:", error)
+console.error(error)
 alert("Ошибка удаления")
 return
 }
@@ -262,8 +271,10 @@ loadProducts()
 }
 
 /* СТАРТ */
+
 loadProducts()
 
 </script>
+
 </body>
 </html>
