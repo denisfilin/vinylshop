@@ -3,162 +3,185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin • Vinyl Shop</title>
+<title>Vinyl Shop</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<!-- 🔥 НОРМАЛЬНЫЙ FAVICON -->
 <link rel="icon" type="image/svg+xml"
-href="data:image/svg+xml;utf8,
+href="data:image/svg+xml,
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-
-<defs>
-
-<clipPath id='label'>
-<circle cx='50' cy='50' r='18'/>
-</clipPath>
-
-<radialGradient id='vinyl'>
-<stop offset='0%' stop-color='%23111111'/>
-<stop offset='60%' stop-color='%23000000'/>
-<stop offset='100%' stop-color='%23000000'/>
-</radialGradient>
-
-</defs>
-
-<g>
-
-<animateTransform
-attributeName='transform'
-type='rotate'
-from='0 50 50'
-to='360 50 50'
-dur='6s'
-repeatCount='indefinite'/>
-
-<circle cx='50' cy='50' r='48' fill='url(%23vinyl)'/>
-
-<circle cx='50' cy='50' r='44' fill='none' stroke='%23161616' stroke-width='0.6'/>
-<circle cx='50' cy='50' r='40' fill='none' stroke='%23161616' stroke-width='0.6'/>
-<circle cx='50' cy='50' r='36' fill='none' stroke='%23161616' stroke-width='0.6'/>
-<circle cx='50' cy='50' r='32' fill='none' stroke='%23161616' stroke-width='0.6'/>
-<circle cx='50' cy='50' r='28' fill='none' stroke='%23161616' stroke-width='0.6'/>
-<circle cx='50' cy='50' r='24' fill='none' stroke='%23161616' stroke-width='0.6'/>
-
-<image
-href='/logo.png'
-x='32'
-y='32'
-width='36'
-height='36'
-clip-path='url(%23label)'/>
-
+<circle cx='50' cy='50' r='48' fill='black'/>
+<circle cx='50' cy='50' r='18' fill='red'/>
 <circle cx='50' cy='50' r='5' fill='white'/>
-
-</g>
 </svg>">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
   --bg:#000;
-  --glass:rgba(0,0,0,0.6);
   --text:#fff;
+  --glass:rgba(0,0,0,0.6);
 }
 
 body{
   margin:0;
   font-family:'Inter',sans-serif;
+  color:var(--text);
   background:#000;
-  color:#fff;
+  overflow-x:hidden;
 }
 
-.bg{
+/* 🔥 КИРПИЧНАЯ СТЕНА */
+.top-bg{
   position:fixed;
   inset:0;
   background:url('/brick-wall-background.avif') center/cover no-repeat;
-  filter:brightness(0.4);
+  filter:brightness(0.5);
   z-index:-1;
 }
 
+/* HEADER */
 header{
+  position:fixed;
+  top:0;
+  width:100%;
   padding:20px 40px;
   backdrop-filter:blur(20px);
   background:var(--glass);
   display:flex;
+  justify-content:space-between;
   align-items:center;
-  gap:20px;
+  z-index:100;
 }
 
 .logo{
-  width:60px;
-  height:60px;
+  height:80px;
+  width:80px;
   border-radius:50%;
   object-fit:cover;
 }
 
-.container{
-  padding:40px 8%;
+/* HERO */
+.hero{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
 }
 
-.glass{
-  background:rgba(255,255,255,0.07);
-  backdrop-filter:blur(20px);
-  border-radius:25px;
-  padding:30px;
-  margin-bottom:40px;
+/* 🔥 ПЛАСТИНКА */
+.vinyl{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  margin-top:40px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 40%),
+    radial-gradient(circle at center, #c00 10%, #111 11%, #000 60%);
+  box-shadow:
+    inset 0 0 40px rgba(255,255,255,0.2),
+    0 0 60px rgba(255,255,255,0.3);
+  animation:spin 8s linear infinite;
 }
 
-input, textarea{
-  width:100%;
-  padding:10px;
-  margin-bottom:12px;
-  border-radius:12px;
-  border:none;
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
 }
 
-button{
-  padding:10px 18px;
-  border:none;
-  border-radius:20px;
-  cursor:pointer;
-  font-weight:600;
-}
-
-.add-btn{
-  background:#fff;
-  color:#000;
-}
-
+/* PRODUCTS */
 .products{
+  padding:120px 5%;
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:25px;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:40px;
 }
 
 .card{
   background:rgba(255,255,255,0.08);
-  padding:20px;
-  border-radius:20px;
+  backdrop-filter:blur(20px);
+  padding:25px;
+  border-radius:25px;
+  text-align:center;
   position:relative;
+  transition:.4s ease;
+}
+
+.card:hover{
+  transform:translateY(-10px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.6);
 }
 
 .card img{
   width:100%;
-  border-radius:15px;
+  border-radius:18px;
 }
 
-.delete{
+button{
+  margin-top:10px;
+  padding:8px 14px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+/* TOOLTIP */
+.tooltip{
   position:absolute;
-  top:10px;
-  right:10px;
-  background:red;
-  color:#fff;
+  bottom:110%;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  padding:12px;
+  border-radius:12px;
+  width:220px;
+  font-size:13px;
+  opacity:0;
+  transition:.3s ease;
+}
+.card:hover .tooltip{
+  opacity:1;
+}
+
+/* 🔥 КНОПКА КОРЗИНЫ СО СЧЁТЧИКОМ */
+.cart{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  width:75px;
+  height:75px;
   border-radius:50%;
-  width:28px;
-  height:28px;
+  background:#fff;
+  color:#000;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
+  font-weight:bold;
+  font-size:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+  transition:.3s ease;
+}
+
+.cart:hover{
+  transform:scale(1.1);
+}
+
+.cart-count{
+  position:absolute;
+  top:-8px;
+  right:-8px;
+  background:red;
+  color:#fff;
+  font-size:14px;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   font-weight:bold;
 }
 </style>
@@ -166,185 +189,66 @@ button{
 
 <body>
 
-<div class="bg"></div>
+<div class="top-bg"></div>
 
 <header>
   <img src="/logo.png" class="logo">
-  <h1>Админ панель</h1>
 </header>
 
-<div class="container">
+<section class="hero">
+  <h1>Music. Style. Atmosphere.</h1>
+  <div class="vinyl"></div>
+</section>
 
-<div class="glass">
-<h2>Добавить товар</h2>
+<section class="products" id="products"></section>
 
-<input id="title" placeholder="Название">
-<input id="price" type="number" placeholder="Цена">
-<textarea id="description" placeholder="Описание"></textarea>
-<input id="image" placeholder="URL изображения">
-
-<button class="add-btn" onclick="addProduct()">Добавить</button>
-</div>
-
-<div class="glass">
-<h2>Список товаров</h2>
-<div class="products" id="products"></div>
-</div>
-
+<div class="cart" onclick="window.location.href='cart.html'">
+  🛒
+  <div class="cart-count" id="cartCount">0</div>
 </div>
 
 <script>
-
-const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
-const SUPABASE_KEY = "sb_publishable_LaKsiiHyowziPgGTl5CdWA_beMfguyx"
-const ADMIN_EMAIL = "denis_filin@bk.ru"
-
-const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-
-async function checkAuth(){
-const { data: { session } } = await client.auth.getSession()
-
-if(!session){
-showLogin()
-return
-}
-
-if(session.user.email !== ADMIN_EMAIL){
-alert("Нет доступа")
-await client.auth.signOut()
-showLogin()
-return
-}
-
-document.getElementById("loginScreen")?.remove()
-loadProducts()
-}
-
-async function login(){
-
-const email = document.getElementById("loginEmail").value
-const password = document.getElementById("loginPassword").value
-
-const { error } = await client.auth.signInWithPassword({
-email,
-password
-})
-
-if(error){
-document.getElementById("loginError").textContent = error.message
-return
-}
-
-checkAuth()
-
-}
-
-async function logout(){
-await client.auth.signOut()
-location.reload()
-}
+let cart = JSON.parse(localStorage.getItem("vinylCart")) || [];
+updateCartCount();
 
 async function loadProducts(){
+  try{
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    const container = document.getElementById('products');
+    container.innerHTML="";
 
-const { data, error } = await client.from("products").select("*")
+    data.forEach(product=>{
+      const card=document.createElement('div');
+      card.className="card";
 
-if(error){
-alert("Ошибка подключения")
-return
+      card.innerHTML=`
+        <img src="${product.image}">
+        <h3>${product.title}</h3>
+        <p>${product.price} ₽</p>
+        <div class="tooltip">${product.description || ""}</div>
+        <button onclick='addToCart(${JSON.stringify(product)})'>+</button>
+      `;
+      container.appendChild(card);
+    });
+
+  }catch(e){
+    console.log("API error");
+  }
 }
 
-const container = document.getElementById("products")
-container.innerHTML=""
-
-data.forEach(product=>{
-
-const card=document.createElement("div")
-card.className="card"
-
-card.innerHTML=`
-<div class="delete" onclick="deleteProduct('${product.id}')">×</div>
-<img src="${product.image}">
-<h3>${product.title}</h3>
-<p>${product.price} ₽</p>
-<small>${product.description || ""}</small>
-`
-
-container.appendChild(card)
-
-})
-
+function addToCart(product){
+  cart.push(product);
+  localStorage.setItem("vinylCart",JSON.stringify(cart));
+  updateCartCount();
 }
 
-async function addProduct(){
-
-const title=document.getElementById("title").value.trim()
-const price=document.getElementById("price").value.trim()
-const description=document.getElementById("description").value.trim()
-const image=document.getElementById("image").value.trim()
-
-if(!title || !price || !image){
-alert("Заполните обязательные поля")
-return
+function updateCartCount(){
+  document.getElementById("cartCount").innerText = cart.length;
 }
 
-const { error } = await client
-.from("products")
-.insert([{ title, price, description, image }])
-
-if(error){
-alert("Нет прав")
-return
-}
-
-document.getElementById("title").value=""
-document.getElementById("price").value=""
-document.getElementById("description").value=""
-document.getElementById("image").value=""
-
-loadProducts()
-
-}
-
-async function deleteProduct(id){
-
-const { error } = await client
-.from("products")
-.delete()
-.eq("id", id)
-
-if(error){
-alert("Нет прав")
-return
-}
-
-loadProducts()
-
-}
-
-function showLogin(){
-
-document.body.innerHTML = `
-<div style="
-height:100vh;
-background:#000;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-gap:15px;
-">
-<h2 style="color:white;">Admin Login</h2>
-<input id="loginEmail" placeholder="Email" style="padding:10px;border-radius:10px;border:none;">
-<input id="loginPassword" type="password" placeholder="Password" style="padding:10px;border-radius:10px;border:none;">
-<button onclick="login()" style="padding:10px 20px;border-radius:20px;border:none;">Войти</button>
-<p id="loginError" style="color:red;"></p>
-</div>
-`
-
-}
-
-checkAuth()
-
+loadProducts();
 </script>
+
 </body>
 </html>
