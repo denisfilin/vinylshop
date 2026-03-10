@@ -159,92 +159,111 @@ button{
 </div>
 
 <script>
-/* 🔥 ВСТАВЬ СВОИ ДАННЫЕ ИЗ SUPABASE */
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* ДАННЫЕ SUPABASE */
 const SUPABASE_URL = "https://rmtcrasayikidqklhyfo.supabase.co"
-const SUPABASE_KEY = "sb_secret_JdSP3B4kQg4oIzjc_pkupg_lv0DZlir"
+const SUPABASE_KEY = "Тsb_publishable_LaKsiiHyowziPgGTl5CdWA_beMfguyx"
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+/* СОЗДАНИЕ КЛИЕНТА */
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-/* Загрузка товаров */
+/* ЗАГРУЗКА ТОВАРОВ */
 async function loadProducts(){
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending:false })
 
-  if(error){
-    console.error(error)
-    alert("Ошибка подключения к базе")
-    return
-  }
+const { data, error } = await supabaseClient
+.from("products")
+.select("*")
+.order("id", { ascending:false })
 
-  const container = document.getElementById("products")
-  container.innerHTML=""
-
-  data.forEach(product=>{
-    const card=document.createElement("div")
-    card.className="card"
-
-    card.innerHTML=`
-      <div class="delete" onclick="deleteProduct('${product.id}')">×</div>
-      <img src="${product.image}">
-      <h3>${product.title}</h3>
-      <p>${product.price} ₽</p>
-      <small>${product.description || ""}</small>
-    `
-
-    container.appendChild(card)
-  })
+if(error){
+console.error("Supabase error:", error)
+alert("Нет связи с базой данных")
+return
 }
 
-/* Добавление */
+const container = document.getElementById("products")
+container.innerHTML=""
+
+data.forEach(product=>{
+
+const card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<div class="delete" onclick="deleteProduct('${product.id}')">×</div>
+<img src="${product.image}">
+<h3>${product.title}</h3>
+<p>${product.price} ₽</p>
+<small>${product.description || ""}</small>
+`
+
+container.appendChild(card)
+
+})
+
+}
+
+/* ДОБАВЛЕНИЕ ТОВАРА */
 async function addProduct(){
-  const title=document.getElementById("title").value
-  const price=document.getElementById("price").value
-  const description=document.getElementById("description").value
-  const image=document.getElementById("image").value
 
-  if(!title || !price || !image){
-    alert("Заполните обязательные поля")
-    return
-  }
+const title=document.getElementById("title").value.trim()
+const price=document.getElementById("price").value.trim()
+const description=document.getElementById("description").value.trim()
+const image=document.getElementById("image").value.trim()
 
-  const { error } = await supabase
-    .from("products")
-    .insert([{ title, price, description, image }])
-
-  if(error){
-    console.error(error)
-    alert("Ошибка добавления")
-    return
-  }
-
-  document.getElementById("title").value=""
-  document.getElementById("price").value=""
-  document.getElementById("description").value=""
-  document.getElementById("image").value=""
-
-  loadProducts()
+if(!title || !price || !image){
+alert("Заполните обязательные поля")
+return
 }
 
-/* Удаление */
+const { error } = await supabaseClient
+.from("products")
+.insert([{
+title,
+price,
+description,
+image
+}])
+
+if(error){
+console.error("Insert error:", error)
+alert("Ошибка добавления")
+return
+}
+
+/* очистка полей */
+document.getElementById("title").value=""
+document.getElementById("price").value=""
+document.getElementById("description").value=""
+document.getElementById("image").value=""
+
+loadProducts()
+
+}
+
+/* УДАЛЕНИЕ */
 async function deleteProduct(id){
-  const { error } = await supabase
-    .from("products")
-    .delete()
-    .eq("id", id)
 
-  if(error){
-    console.error(error)
-    alert("Ошибка удаления")
-    return
-  }
+const { error } = await supabaseClient
+.from("products")
+.delete()
+.eq("id", id)
 
-  loadProducts()
+if(error){
+console.error("Delete error:", error)
+alert("Ошибка удаления")
+return
 }
 
 loadProducts()
-</script>
 
+}
+
+/* СТАРТ */
+loadProducts()
+
+</script>
 </body>
 </html>
